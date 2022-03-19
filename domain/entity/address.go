@@ -3,6 +3,9 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Address struct {
@@ -23,6 +26,11 @@ func (Address) Tablename() string {
 	return "addresses"
 }
 
+func (address *Address) BeforeCreate(db *gorm.DB) error {
+	address.ID = uuid.New().String()
+	return nil
+}
+
 func (address *Address) Validate() error {
 	errors := map[string]interface{}{}
 	if address.Line1 == "" || len(address.Line1) == 0 {
@@ -39,6 +47,12 @@ func (address *Address) Validate() error {
 	}
 	if address.Country == "" || len(address.Country) == 0 {
 		errors["address_country"] = "Address Country Missing"
+	}
+	if address.CreatedByUsername == "" || len(address.CreatedByUsername) == 0 {
+		errors["created_by"] = "Created By Required."
+	}
+	if address.UpdatedByUsername == "" || len(address.UpdatedByUsername) == 0 {
+		errors["updated_by"] = "Updated By Required."
 	}
 	return utilities.ConvertMapToError(errors)
 }

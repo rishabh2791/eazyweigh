@@ -24,14 +24,14 @@ func NewServerConfig() *ServerConfig {
 	if os.Getenv("eazyweigh_server") != "" || len(os.Getenv("eazyweigh_server")) != 0 {
 		serverConfig.ServerAddress = os.Getenv("eazyweigh_server")
 	} else {
-		serverConfig.ServerAddress = "localhost"
+		serverConfig.ServerAddress = defaultsettings["server_address"]
 	}
 	if os.Getenv("eazyweigh_server_port") != "" || len(os.Getenv("eazyweigh_server_port")) != 0 {
 		serverConfig.ServerPort = os.Getenv("eazyweigh_server_port")
 	} else {
-		serverConfig.ServerPort = "8000"
+		serverConfig.ServerPort = defaultsettings["server_port"]
 	}
-	serverConfig.debug = true
+	serverConfig.debug = debug
 	serverConfig.dbConfig = NewDatabaseConfig()
 	serverConfig.cacheConfig = NewCacheConfig()
 	serverConfig.keyConfig = NewKeyConfig()
@@ -72,27 +72,27 @@ func NewDatabaseConfig() *databaseConfig {
 	if os.Getenv("eazyweigh_database_server") != "" || len(os.Getenv("eazyweigh_database_server")) != 0 {
 		dbConf.DbHost = os.Getenv("eazyweigh_database_server")
 	} else {
-		dbConf.DbHost = "localhost"
+		dbConf.DbHost = defaultsettings["db_host"]
 	}
 	if os.Getenv("eazyweigh_database_server_port") != "" || len(os.Getenv("eazyweigh_database_server_port")) != 0 {
 		dbConf.DbPort = os.Getenv("eazyweigh_database_server_port")
 	} else {
-		dbConf.DbPort = "3306"
+		dbConf.DbPort = defaultsettings["db_port"]
 	}
 	if os.Getenv("mysql_username") != "" || len(os.Getenv("mysql_username")) != 0 {
 		dbConf.DbUser = os.Getenv("mysql_username")
 	} else {
-		dbConf.DbUser = ""
+		dbConf.DbUser = defaultsettings["db_user"]
 	}
 	if os.Getenv("mysql_password") != "" || len(os.Getenv("mysql_password")) != 0 {
 		dbConf.DbPassword = os.Getenv("mysql_password")
 	} else {
-		dbConf.DbPassword = ""
+		dbConf.DbPassword = defaultsettings["db_pass"]
 	}
 	if os.Getenv("eazyweigh_database_name") != "" || len(os.Getenv("eazyweigh_database_name")) != 0 {
 		dbConf.DbName = os.Getenv("eazyweigh_database_name")
 	} else {
-		dbConf.DbName = "eazyweigh"
+		dbConf.DbName = defaultsettings["db_name"]
 	}
 	return &dbConf
 }
@@ -108,17 +108,17 @@ func NewCacheConfig() *cacheConfig {
 	if os.Getenv("cache_server") != "" || len(os.Getenv("cache_server")) != 0 {
 		cacheConf.CacheHost = os.Getenv("cache_server")
 	} else {
-		cacheConf.CacheHost = "localhost"
+		cacheConf.CacheHost = defaultsettings["cache_host"]
 	}
 	if os.Getenv("cache_port") != "" || len(os.Getenv("cache_port")) != 0 {
 		cacheConf.CachePort = os.Getenv("cache_port")
 	} else {
-		cacheConf.CachePort = "6379"
+		cacheConf.CachePort = defaultsettings["cache_port"]
 	}
 	if os.Getenv("cache_password") != "" || len(os.Getenv("cache_password")) != 0 {
 		cacheConf.CachePassword = os.Getenv("cache_password")
 	} else {
-		cacheConf.CachePassword = "rishabh2791"
+		cacheConf.CachePassword = defaultsettings["db_password"]
 	}
 	return &cacheConf
 }

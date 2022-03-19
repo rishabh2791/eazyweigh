@@ -29,5 +29,14 @@ func (UserRole) Tablename() string {
 
 func (userRole *UserRole) Validate() error {
 	errors := map[string]interface{}{}
+	if userRole.Role == "" || len(userRole.Role) == 0 {
+		errors["role"] = "Role Required."
+	}
+	if userRole.Description == "" || len(userRole.Description) == 0 {
+		errors["description"] = "Role Description Required."
+	}
+	if userRole.CompanyID == "" || len(userRole.CompanyID) == 0 {
+		errors["company"] = "Company Required."
+	}
 	return utilities.ConvertMapToError(errors)
 }

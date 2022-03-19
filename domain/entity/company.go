@@ -24,5 +24,14 @@ func (Company) Tablename() string {
 
 func (company *Company) Validate() error {
 	errors := map[string]interface{}{}
+	if company.Name == "" || len(company.Name) == 0 {
+		errors["name"] = "Company Name Required."
+	}
+	if company.CreatedByUsername == "" || len(company.CreatedByUsername) == 0 {
+		errors["created_by"] = "Created By Required."
+	}
+	if company.UpdatedByUsername == "" || len(company.UpdatedByUsername) == 0 {
+		errors["updated_by"] = "Updated By Required."
+	}
 	return utilities.ConvertMapToError(errors)
 }

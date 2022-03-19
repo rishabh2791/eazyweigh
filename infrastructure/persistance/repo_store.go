@@ -13,9 +13,29 @@ import (
 )
 
 type RepoStore struct {
-	DB     *gorm.DB
-	Cache  *redis.Client
-	Logger hclog.Logger
+	DB                          *gorm.DB
+	Cache                       *redis.Client
+	Logger                      hclog.Logger
+	AddressRepo                 *AddressRepo
+	AuthRepo                    *AuthRepo
+	BOMRepo                     *BOMRepo
+	BOMItemRepo                 *BOMItemRepo
+	CompanyRepo                 *CompanyRepo
+	FactoryRepo                 *FactoryRepo
+	JobRepo                     *JobRepo
+	JobItemRepo                 *JobItemRepo
+	JobAssignmentRepo           *JobAssignmentRepo
+	MaterialRepo                *MaterialRepo
+	OverIssueRepo               *OverIssueRepo
+	ScannedDataRepo             *ScannedDataRepo
+	ShiftRepo                   *ShiftRepo
+	ShiftScheduleRepo           *ShiftScheduleRepo
+	TerminalRepo                *TerminalRepo
+	UnderIssueRepo              *UnderIssueRepo
+	UnitOfMeasureRepo           *UnitOfMeasureRepo
+	UnitOfMeasureConversionRepo *UnitOfMeasureConversionRepo
+	UserRepo                    *UserRepo
+	UserRoleRepo                *UserRoleRepo
 }
 
 func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*RepoStore, error) {
@@ -46,6 +66,26 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.DB = gormDB
 	repoStore.Logger = logging
 	repoStore.Cache = cacheStore.RedisClient
+	repoStore.AddressRepo = NewAddressRepo(gormDB, logging)
+	repoStore.AuthRepo = NewAuthRepo(logging, serverConfig, cacheStore.RedisClient)
+	repoStore.BOMItemRepo = NewBOMItemRepo(gormDB, logging)
+	repoStore.BOMRepo = NewBOMRepo(gormDB, logging, repoStore.BOMItemRepo)
+	repoStore.CompanyRepo = NewCompanyRepo(gormDB, logging)
+	repoStore.FactoryRepo = NewFactoryRepo(gormDB, logging)
+	repoStore.JobRepo = NewJobRepo(gormDB, logging)
+	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
+	repoStore.JobAssignmentRepo = NewJobAssignmentRepo(gormDB, logging)
+	repoStore.MaterialRepo = NewMaterialRepo(gormDB, logging)
+	repoStore.OverIssueRepo = NewOverIssueRepo(gormDB, logging)
+	repoStore.ScannedDataRepo = NewScannedDataRepo(gormDB, logging)
+	repoStore.ShiftRepo = NewShiftRepo(gormDB, logging)
+	repoStore.ShiftScheduleRepo = NewShiftScheduleRepo(gormDB, logging)
+	repoStore.TerminalRepo = NewTerminalRepo(gormDB, logging)
+	repoStore.UnderIssueRepo = NewUnderIssueRepo(gormDB, logging)
+	repoStore.UnitOfMeasureRepo = NewUnitOfMeasureRepo(gormDB, logging)
+	repoStore.UnitOfMeasureConversionRepo = NewUnitOfMeasureConversionRepo(gormDB, logging)
+	repoStore.UserRepo = NewUserRepo(gormDB, logging)
+	repoStore.UserRoleRepo = NewUserRoleRepo(gormDB, logging)
 
 	return &repoStore, nil
 }
@@ -54,14 +94,16 @@ func (repoStore *RepoStore) Migrate() error {
 	return repoStore.DB.AutoMigrate(
 		&entity.UserRole{},
 		&entity.User{},
-		&entity.UserRoleAccess{},
 		&entity.Address{},
 		&entity.Company{},
 		&entity.Factory{},
+		&entity.UserRoleAccess{},
 		&entity.UserFactoryAccess{},
+		&entity.UserCompanyAccess{},
 		&entity.UnitOfMeasure{},
 		&entity.UnitOfMeasureConversion{},
 		&entity.Terminal{},
+		&entity.UserTerminalAccess{},
 		&entity.Material{},
 		&entity.BOM{},
 		&entity.BOMItem{},

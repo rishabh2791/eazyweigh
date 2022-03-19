@@ -3,6 +3,9 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Job struct {
@@ -11,10 +14,11 @@ type Job struct {
 	JobCode           string         `json:"job_code" gorm:"size:10;not null;"`
 	MaterialID        string         `json:"material_code" gorm:"size:191;not null;"`
 	Material          *Material      `json:"material"`
-	Quantity          float32        `json:"quantity"`
+	Quantity          float32        `json:"quantity" gorm:"default:0.0;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
 	JobItems          []JobItem      `json:"job_items"`
+	Processing        bool           `json:"processing" gorm:"default:false;"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`
@@ -25,8 +29,28 @@ func (Job) Tablename() string {
 	return "jobs"
 }
 
+func (job *Job) BeforeCreate(db *gorm.DB) error {
+	job.ID = uuid.New().String()
+	return nil
+}
+
 func (job *Job) Validate() error {
 	errors := map[string]interface{}{}
+	if job.JobCode == "" || len(job.JobCode) == 0 {
+		errors["job_code"] = "Job Code Required."
+	}
+	if job.MaterialID == "" || len(job.MaterialID) == 0 {
+		errors["material"] = "Material Required."
+	}
+	if job.UnitOfMeasureID == "" || len(job.UnitOfMeasureID) == 0 {
+		errors["uom"] = "Unit of Measurement for Material: " + job.MaterialID + " Required."
+	}
+	if job.CreatedByUsername == "" || len(job.CreatedByUsername) == 0 {
+		errors["created_by"] = "Created By Required."
+	}
+	if job.UpdatedByUsername == "" || len(job.UpdatedByUsername) == 0 {
+		errors["updated_by"] = "Updated By Required."
+	}
 	return utilities.ConvertMapToError(errors)
 }
 

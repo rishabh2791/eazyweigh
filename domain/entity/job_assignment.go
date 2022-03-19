@@ -4,6 +4,9 @@ import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type JobAssignment struct {
@@ -25,7 +28,24 @@ func (JobAssignment) Tablename() string {
 	return "job_assignments"
 }
 
+func (jobAssignment *JobAssignment) BeforeCreate(db *gorm.DB) error {
+	jobAssignment.ID = uuid.New().String()
+	return nil
+}
+
 func (job *JobAssignment) Validate() error {
 	errors := map[string]interface{}{}
+	if job.JobID == "" || len(job.JobID) == 0 {
+		errors["job_id"] = "Job Details Missing."
+	}
+	if job.ShiftScheduleID == "" || len(job.ShiftScheduleID) == 0 {
+		errors["shift_id"] = "Shift Details Missing."
+	}
+	if job.CreatedByUsername == "" || len(job.CreatedByUsername) == 0 {
+		errors["created_by"] = "Created By Details Missing."
+	}
+	if job.UpdatedByUsername == "" || len(job.UpdatedByUsername) == 0 {
+		errors["updated_by"] = "Updated By Details Missing."
+	}
 	return utilities.ConvertMapToError(errors)
 }

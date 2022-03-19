@@ -3,6 +3,9 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type OverIssue struct {
@@ -26,7 +29,27 @@ func (OverIssue) Tablename() string {
 	return "over_issues"
 }
 
+func (overIssue *OverIssue) BeforeCreate(db *gorm.DB) error {
+	overIssue.ID = uuid.New().String()
+	return nil
+}
+
 func (overIssue *OverIssue) Validate() error {
 	errors := map[string]interface{}{}
+	if overIssue.JobItemID == "" || len(overIssue.JobItemID) == 0 {
+		errors["job"] = "Job Details Required."
+	}
+	if overIssue.SupervisorUsername == "" || len(overIssue.SupervisorUsername) == 0 {
+		errors["supervisor"] = "Supervisor Required."
+	}
+	if overIssue.UnitOfMeasureID == "" || len(overIssue.UnitOfMeasureID) == 0 {
+		errors["unit_of_measure"] = "Unit of Measure Required."
+	}
+	if overIssue.CreatedByUsername == "" || len(overIssue.CreatedByUsername) == 0 {
+		errors["created_by"] = "Created By Required."
+	}
+	if overIssue.UpdatedByUsername == "" || len(overIssue.UpdatedByUsername) == 0 {
+		errors["updated_by"] = "Updated By Required."
+	}
 	return utilities.ConvertMapToError(errors)
 }
