@@ -23,6 +23,7 @@ func NewCompanyRouter(router *gin.RouterGroup, iStore *interfaces.InterfaceStore
 
 func (companyRouter *CompanyRouter) ServeRoutes() {
 	companyRouter.router.POST("/create/", companyRouter.middlewares.AuthMiddleware.ValidateAccessToken(), companyRouter.interfaceStore.CompanyInterface.Create)
+	companyRouter.router.POST("/create/multi/", companyRouter.middlewares.AuthMiddleware.ValidateAccessToken(), companyRouter.interfaceStore.CompanyInterface.CreateMultiple)
 	companyRouter.router.GET("/:id/", companyRouter.middlewares.AuthMiddleware.ValidateAccessToken(), companyRouter.interfaceStore.CompanyInterface.Get)
 	companyRouter.router.POST("/", companyRouter.middlewares.AuthMiddleware.ValidateAccessToken(), companyRouter.interfaceStore.CompanyInterface.List)
 	companyRouter.router.PATCH("/:id/", companyRouter.middlewares.AuthMiddleware.ValidateAccessToken(), companyRouter.interfaceStore.CompanyInterface.Update)

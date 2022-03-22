@@ -97,6 +97,8 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.Address{},
 		&entity.Company{},
 		&entity.Factory{},
+		&entity.UserCompany{},
+		&entity.UserFactory{},
 		&entity.UserRoleAccess{},
 		&entity.UserFactoryAccess{},
 		&entity.UserCompanyAccess{},

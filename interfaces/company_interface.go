@@ -70,6 +70,55 @@ func (companyInterface *CompanyInterface) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+func (companyInterface *CompanyInterface) CreateMultiple(ctx *gin.Context) {
+	response := value_objects.Response{}
+	createdModels := []interface{}{}
+	creationErrors := []interface{}{}
+
+	requestingUser, ok := ctx.Get("user")
+	if !ok {
+		response.Status = false
+		response.Message = "Anonymous User"
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
+	}
+	user := requestingUser.(entity.User)
+
+	models := []entity.Company{}
+	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
+	if jsonErr != nil {
+		response.Status = false
+		response.Message = jsonErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	for _, model := range models {
+		model.CreatedByUsername = user.Username
+		model.UpdatedByUsername = user.Username
+
+		created, creationErr := companyInterface.appStore.CompanyApp.Create(&model)
+		if creationErr != nil {
+			creationErrors = append(creationErrors, creationErr)
+		} else {
+			createdModels = append(createdModels, created)
+		}
+	}
+
+	response.Status = true
+	response.Message = "Companies Created."
+	response.Payload = map[string]interface{}{
+		"models": createdModels,
+		"errors": creationErrors,
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func (companyInterface *CompanyInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
 	id := ctx.Param("id")

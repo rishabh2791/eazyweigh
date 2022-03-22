@@ -13,6 +13,7 @@ type Shift struct {
 	value_objects.BaseModel
 	ID                string    `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
 	FactoryID         string    `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_shift;"`
+	Factory           *Factory  `json:"factory"`
 	Code              string    `json:"code" gorm:"size:10;not null;uniqueIndex:factory_shift;"`
 	Description       string    `json:"description" gorm:"size:200;not null;"`
 	StartTime         time.Time `json:"start_time"`

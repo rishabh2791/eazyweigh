@@ -12,15 +12,18 @@ import (
 // 3. Production Manager  		Next in line to Administrator has access to most tables, but can not create factories, addresses.
 // 4. Shift Incharge
 // 5. Operator
+// 6. Viewer
 // In addition administrator can create custom Roles and assign access levels to these roles.
+
+// As soon as company is created, need to assign Administrator, Production Manager, Shift Incharge, Operator and Viewer
 
 type UserRole struct {
 	value_objects.BaseModel
-	Role        string   `json:"role" gorm:"size:20;not null;unique;primaryKey;"`
-	Description string   `json:"description" gorm:"size:2000;not null;"`
-	CompanyID   string   `json:"company_id"`
-	Company     *Company `json:"company"`
-	Active      bool     `json:"active" gorm:"default:false;"`
+	ID          string `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
+	Role        string `json:"role" gorm:"size:20;not null;uniqueIndex:company_role;"`
+	Description string `json:"description" gorm:"size:2000;not null;"`
+	CompanyID   string `json:"company_id" gorm:"size:191;uniqueIndex:company_role;"`
+	Active      bool   `json:"active" gorm:"default:false;"`
 }
 
 func (UserRole) Tablename() string {
