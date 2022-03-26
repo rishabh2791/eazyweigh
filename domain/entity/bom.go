@@ -11,7 +11,8 @@ import (
 type BOM struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	MaterialID        string         `json:"material_code" gorm:"size:191;not null;uniqueIndex:material_revision;"`
+	FactoryID         string         `json:"factory_id" gorm:"size:191;not null;"`
+	MaterialID        string         `json:"material_id" gorm:"size:191;not null;uniqueIndex:material_revision;"`
 	Material          *Material      `json:"material"`
 	BOMItems          []BOMItem      `json:"bom_items"`
 	UnitSize          float32        `json:"unit_size" gorm:"default:1000;"`

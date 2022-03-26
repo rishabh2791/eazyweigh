@@ -25,6 +25,7 @@ type RepoStore struct {
 	JobRepo                     *JobRepo
 	JobItemRepo                 *JobItemRepo
 	JobAssignmentRepo           *JobAssignmentRepo
+	JobItemAssignmentRepo       *JobItemAssignmentRepo
 	MaterialRepo                *MaterialRepo
 	OverIssueRepo               *OverIssueRepo
 	ScannedDataRepo             *ScannedDataRepo
@@ -36,6 +37,8 @@ type RepoStore struct {
 	UnitOfMeasureConversionRepo *UnitOfMeasureConversionRepo
 	UserRepo                    *UserRepo
 	UserRoleRepo                *UserRoleRepo
+	UserCompanyRepo             *UserCompanyRepo
+	UserFactoryRepo             *UserFactoryRepo
 }
 
 func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*RepoStore, error) {
@@ -75,6 +78,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.JobRepo = NewJobRepo(gormDB, logging)
 	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
 	repoStore.JobAssignmentRepo = NewJobAssignmentRepo(gormDB, logging)
+	repoStore.JobItemAssignmentRepo = NewJobItemAssignmentRepo(gormDB, logging)
 	repoStore.MaterialRepo = NewMaterialRepo(gormDB, logging)
 	repoStore.OverIssueRepo = NewOverIssueRepo(gormDB, logging)
 	repoStore.ScannedDataRepo = NewScannedDataRepo(gormDB, logging)
@@ -86,6 +90,8 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.UnitOfMeasureConversionRepo = NewUnitOfMeasureConversionRepo(gormDB, logging)
 	repoStore.UserRepo = NewUserRepo(gormDB, logging)
 	repoStore.UserRoleRepo = NewUserRoleRepo(gormDB, logging)
+	repoStore.UserCompanyRepo = NewUserCompanyRepo(gormDB, logging)
+	repoStore.UserFactoryRepo = NewUserFactoryRepo(gormDB, logging)
 
 	return &repoStore, nil
 }
@@ -114,6 +120,7 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.Shift{},
 		&entity.ShiftSchedule{},
 		&entity.JobAssignment{},
+		&entity.JobItemAssignment{},
 		&entity.OverIssue{},
 		&entity.UnderIssue{},
 	)

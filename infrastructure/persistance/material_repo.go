@@ -51,7 +51,20 @@ func (materialRepo *MaterialRepo) Get(id string) (*entity.Material, error) {
 func (materialRepo *MaterialRepo) List(conditions string) ([]entity.Material, error) {
 	materials := []entity.Material{}
 
-	getErr := materialRepo.DB.Preload(clause.Associations).Where(conditions).Find(&materials).Error
+	getErr := materialRepo.DB.
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&materials).Error
 	if getErr != nil {
 		return nil, getErr
 	}

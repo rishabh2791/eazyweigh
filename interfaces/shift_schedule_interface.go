@@ -36,7 +36,7 @@ func (shiftScheduleInterface *ShiftScheduleInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.ShiftSchedule{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
@@ -83,7 +83,7 @@ func (shiftScheduleInterface *ShiftScheduleInterface) CreateMultiple(ctx *gin.Co
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	models := []entity.ShiftSchedule{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
@@ -100,11 +100,11 @@ func (shiftScheduleInterface *ShiftScheduleInterface) CreateMultiple(ctx *gin.Co
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		created, creationErr := shiftScheduleInterface.appStore.ShiftScheduleApp.Create(&model)
+		_, creationErr := shiftScheduleInterface.appStore.ShiftScheduleApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 

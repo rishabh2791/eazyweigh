@@ -12,33 +12,22 @@ import (
 	"github.com/hashicorp/go-hclog"
 )
 
-type ShiftInterface struct {
+type UserCompanyInterface struct {
 	appStore *application.AppStore
 	logger   hclog.Logger
 }
 
-func NewShiftInterface(appStore *application.AppStore, logger hclog.Logger) *ShiftInterface {
-	return &ShiftInterface{
+func NewUserCompanyInterface(appStore *application.AppStore, logger hclog.Logger) *UserCompanyInterface {
+	return &UserCompanyInterface{
 		appStore: appStore,
 		logger:   logger,
 	}
 }
 
-func (shiftInterface *ShiftInterface) Create(ctx *gin.Context) {
+func (userCompanyInterface *UserCompanyInterface) Create(ctx *gin.Context) {
 	response := value_objects.Response{}
 
-	requestingUser, ok := ctx.Get("user")
-	if !ok {
-		response.Status = false
-		response.Message = "Anonymous User"
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
-	user := requestingUser.(*entity.User)
-
-	model := entity.Shift{}
+	model := entity.UserCompany{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -49,10 +38,7 @@ func (shiftInterface *ShiftInterface) Create(ctx *gin.Context) {
 		return
 	}
 
-	model.CreatedByUsername = user.Username
-	model.UpdatedByUsername = user.Username
-
-	created, creationErr := shiftInterface.appStore.ShiftApp.Create(&model)
+	created, creationErr := userCompanyInterface.appStore.UserCompanyApp.Create(&model)
 	if creationErr != nil {
 		response.Status = false
 		response.Message = creationErr.Error()
@@ -63,34 +49,13 @@ func (shiftInterface *ShiftInterface) Create(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Shift Created."
+	response.Message = "User Company Created."
 	response.Payload = created
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (shiftInterface *ShiftInterface) Get(ctx *gin.Context) {
-	response := value_objects.Response{}
-	id := ctx.Param("id")
-
-	shift, getErr := shiftInterface.appStore.ShiftApp.Get(id)
-	if getErr != nil {
-		response.Status = false
-		response.Message = getErr.Error()
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-
-	response.Status = true
-	response.Message = "Shift Found"
-	response.Payload = shift
-
-	ctx.JSON(http.StatusOK, response)
-}
-
-func (shiftInterface *ShiftInterface) List(ctx *gin.Context) {
+func (userCompanyInterface *UserCompanyInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	conditions := map[string]interface{}{}
@@ -104,7 +69,7 @@ func (shiftInterface *ShiftInterface) List(ctx *gin.Context) {
 		return
 	}
 
-	shifts, getErr := shiftInterface.appStore.ShiftApp.List(utilities.ConvertJSONToSQL(conditions))
+	uoms, getErr := userCompanyInterface.appStore.UserCompanyApp.Get(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -115,8 +80,8 @@ func (shiftInterface *ShiftInterface) List(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Shifts Found"
-	response.Payload = shifts
+	response.Message = "User Factories Found"
+	response.Payload = uoms
 
 	ctx.JSON(http.StatusOK, response)
 }

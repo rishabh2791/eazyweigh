@@ -36,7 +36,7 @@ func (bomItemInterface *BOMItemInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.BOMItem{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
@@ -83,7 +83,7 @@ func (bomItemInterface *BOMItemInterface) CreateMultiple(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	models := []entity.BOMItem{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
@@ -100,11 +100,11 @@ func (bomItemInterface *BOMItemInterface) CreateMultiple(ctx *gin.Context) {
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		created, creationErr := bomItemInterface.appStore.BOMItemApp.Create(&model)
+		_, creationErr := bomItemInterface.appStore.BOMItemApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 

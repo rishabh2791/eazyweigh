@@ -12,10 +12,11 @@ type BOMItem struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
 	BOMID             string         `json:"bom_id" gorm:"size:191;not null;uniqueIndex:bom_material;"`
-	MaterialID        string         `json:"material_code" gorm:"size:191;not null;uniqueIndex:bom_material;"`
+	MaterialID        string         `json:"material_id" gorm:"size:191;not null;uniqueIndex:bom_material;"`
 	Material          *Material      `json:"material"`
 	Quantity          float32        `json:"quantity"`
-	Tolerance         float32        `json:"tolerance" gorm:"default:0;"`
+	UpperTolerance    float32        `json:"upper_tolerance" gorm:"default:0;"`
+	LowerTolerance    float32        `json:"lower_tolerance" gorm:"default:0;"`
 	OverIssue         bool           `json:"over_issue" gorm:"default:false;"`
 	UnderIssue        bool           `json:"under_issue" gorm:"default:false;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`

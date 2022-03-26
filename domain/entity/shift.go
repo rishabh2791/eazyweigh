@@ -3,7 +3,6 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -11,17 +10,17 @@ import (
 
 type Shift struct {
 	value_objects.BaseModel
-	ID                string    `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	FactoryID         string    `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_shift;"`
-	Factory           *Factory  `json:"factory"`
-	Code              string    `json:"code" gorm:"size:10;not null;uniqueIndex:factory_shift;"`
-	Description       string    `json:"description" gorm:"size:200;not null;"`
-	StartTime         time.Time `json:"start_time"`
-	EndTime           time.Time `json:"end_time"`
-	CreatedByUsername string    `json:"created_by_username" gorm:"size:20;not null;"`
-	CreatedBy         *User     `json:"created_by"`
-	UpdatedByUsername string    `json:"updated_by_username" gorm:"size:20;not null;"`
-	UpdatedBy         *User     `json:"updated_by"`
+	ID                string   `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
+	FactoryID         string   `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_shift;"`
+	Factory           *Factory `json:"factory"`
+	Code              string   `json:"code" gorm:"size:10;not null;uniqueIndex:factory_shift;"`
+	Description       string   `json:"description" gorm:"size:200;not null;"`
+	StartTime         string   `json:"start_time" gorm:"size:5;"`
+	EndTime           string   `json:"end_time" gorm:"size:5;"`
+	CreatedByUsername string   `json:"created_by_username" gorm:"size:20;not null;"`
+	CreatedBy         *User    `json:"created_by"`
+	UpdatedByUsername string   `json:"updated_by_username" gorm:"size:20;not null;"`
+	UpdatedBy         *User    `json:"updated_by"`
 }
 
 func (Shift) Tablename() string {
@@ -44,10 +43,10 @@ func (shift *Shift) Validate() error {
 	if shift.Description == "" || len(shift.Description) == 0 {
 		errors["description"] = "Description for Shift Required."
 	}
-	if shift.StartTime.String() == "" || len(shift.StartTime.String()) == 0 {
+	if shift.StartTime == "" || len(shift.StartTime) == 0 {
 		errors["start_time"] = "Start Time Required."
 	}
-	if shift.EndTime.String() == "" || len(shift.EndTime.String()) == 0 {
+	if shift.EndTime == "" || len(shift.EndTime) == 0 {
 		errors["end_time"] = "End Time Required."
 	}
 	if shift.CreatedByUsername == "" || len(shift.CreatedByUsername) == 0 {

@@ -11,6 +11,7 @@ import (
 type Address struct {
 	value_objects.BaseModel
 	ID                string `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
+	CompanyID         string `json:"company_id" gorm:"size:191;not null;"`
 	Line1             string `json:"line1" gorm:"size:500;not null;"`
 	Line2             string `json:"line2" gorm:"size:500;"`
 	City              string `json:"city" gorm:"size:100;not null;"`
@@ -33,6 +34,9 @@ func (address *Address) BeforeCreate(db *gorm.DB) error {
 
 func (address *Address) Validate() error {
 	errors := map[string]interface{}{}
+	if address.CompanyID == "" || len(address.CompanyID) == 0 {
+		errors["company"] = "Company  Missing"
+	}
 	if address.Line1 == "" || len(address.Line1) == 0 {
 		errors["address_line1"] = "Address Line 1 Missing"
 	}

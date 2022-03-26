@@ -3,6 +3,9 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // Default options are:
@@ -13,6 +16,7 @@ import (
 // 4. Shift Incharge
 // 5. Operator
 // 6. Viewer
+// 7. Verifier 					Can verify if all the materials weighed out and put on pallet is correct
 // In addition administrator can create custom Roles and assign access levels to these roles.
 
 // As soon as company is created, need to assign Administrator, Production Manager, Shift Incharge, Operator and Viewer
@@ -20,14 +24,19 @@ import (
 type UserRole struct {
 	value_objects.BaseModel
 	ID          string `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
-	Role        string `json:"role" gorm:"size:20;not null;uniqueIndex:company_role;"`
+	Role        string `json:"role" gorm:"size:20;not null;"`
 	Description string `json:"description" gorm:"size:2000;not null;"`
-	CompanyID   string `json:"company_id" gorm:"size:191;uniqueIndex:company_role;"`
+	CompanyID   string `json:"company_id" gorm:"size:191;"`
 	Active      bool   `json:"active" gorm:"default:false;"`
 }
 
 func (UserRole) Tablename() string {
 	return "user_roles"
+}
+
+func (userRole *UserRole) BeforeCreate(db *gorm.DB) error {
+	userRole.ID = uuid.New().String()
+	return nil
 }
 
 func (userRole *UserRole) Validate() error {

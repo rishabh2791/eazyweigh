@@ -36,7 +36,7 @@ func (materialInterface *MaterialInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.Material{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
@@ -83,7 +83,7 @@ func (materialInterface *MaterialInterface) CreateMultiple(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	models := []entity.Material{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
@@ -100,11 +100,11 @@ func (materialInterface *MaterialInterface) CreateMultiple(ctx *gin.Context) {
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		created, creationErr := materialInterface.appStore.MaterialApp.Create(&model)
+		_, creationErr := materialInterface.appStore.MaterialApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 

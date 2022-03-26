@@ -7,28 +7,31 @@ import (
 )
 
 type InterfaceStore struct {
-	logger                 hclog.Logger
-	appStore               *application.AppStore
-	AddressInterface       *AddressInterface
-	AuthInterface          *AuthInterface
-	BOMInterface           *BOMInterface
-	BOMItemInterface       *BOMItemInterface
-	CompanyInterface       *CompanyInterface
-	FactoryInterface       *FactoryInterface
-	JobInterface           *JobInterface
-	JobAssignmentInterface *JobAssignmentInterface
-	JobItemInterface       *JobItemInterface
-	MaterialInterface      *MaterialInterface
-	OverIssueInterface     *OverIssueInterface
-	ScannedDataInterface   *ScannedDataInterface
-	ShiftInterface         *ShiftInterface
-	ShiftScheduleInterface *ShiftScheduleInterface
-	TerminalInterface      *TerminalInterface
-	UnderIssueInterface    *UnderIssueInterface
-	UOMInterface           *UOMInterface
-	UOMConversionInterface *UOMConversionInterface
-	UserInterface          *UserInterface
-	UserRoleInterface      *UserRoleInterface
+	logger                     hclog.Logger
+	appStore                   *application.AppStore
+	AddressInterface           *AddressInterface
+	AuthInterface              *AuthInterface
+	BOMInterface               *BOMInterface
+	BOMItemInterface           *BOMItemInterface
+	CompanyInterface           *CompanyInterface
+	FactoryInterface           *FactoryInterface
+	JobInterface               *JobInterface
+	JobAssignmentInterface     *JobAssignmentInterface
+	JobItemInterface           *JobItemInterface
+	JobItemAssignmentInterface *JobItemAssignmentInterface
+	MaterialInterface          *MaterialInterface
+	OverIssueInterface         *OverIssueInterface
+	ScannedDataInterface       *ScannedDataInterface
+	ShiftInterface             *ShiftInterface
+	ShiftScheduleInterface     *ShiftScheduleInterface
+	TerminalInterface          *TerminalInterface
+	UnderIssueInterface        *UnderIssueInterface
+	UOMInterface               *UOMInterface
+	UOMConversionInterface     *UOMConversionInterface
+	UserInterface              *UserInterface
+	UserRoleInterface          *UserRoleInterface
+	UserCompanyInterface       *UserCompanyInterface
+	UserFactoryInterface       *UserFactoryInterface
 }
 
 func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *InterfaceStore {
@@ -44,6 +47,7 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.JobInterface = NewJobInterface(appStore, logger)
 	interfaceStore.JobItemInterface = NewJobItemInterface(appStore, logger)
 	interfaceStore.JobAssignmentInterface = NewJobAssignmentInterface(appStore, logger)
+	interfaceStore.JobItemAssignmentInterface = NewJobItemAssignmentInterface(appStore, logger)
 	interfaceStore.MaterialInterface = NewMaterialInterface(appStore, logger)
 	interfaceStore.OverIssueInterface = NewOverIssueInterface(appStore, logger)
 	interfaceStore.ScannedDataInterface = NewScannedDataInterface(appStore, logger)
@@ -55,5 +59,7 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.UOMConversionInterface = NewUOMConversionInterface(appStore, logger)
 	interfaceStore.UserInterface = NewUserInterface(appStore, logger)
 	interfaceStore.UserRoleInterface = NewUserRoleInterface(appStore, logger)
+	interfaceStore.UserCompanyInterface = NewUserCompanyInterface(appStore, logger)
+	interfaceStore.UserFactoryInterface = NewUserFactoryInterface(appStore, logger)
 	return &interfaceStore
 }

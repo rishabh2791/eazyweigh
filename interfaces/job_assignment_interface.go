@@ -36,7 +36,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.JobAssignment{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
@@ -83,7 +83,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	models := []entity.JobAssignment{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
@@ -100,11 +100,11 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		created, creationErr := jobAssignmentInterface.appStore.JobAssignmentApp.Create(&model)
+		_, creationErr := jobAssignmentInterface.appStore.JobAssignmentApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 

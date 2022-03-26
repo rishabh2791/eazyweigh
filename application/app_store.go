@@ -12,6 +12,7 @@ type AppStore struct {
 	JobApp                     *JobApp
 	JobItemApp                 *JobItemApp
 	JobAssignmentApp           *JobAssignmentApp
+	JobItemAssignmentApp       *JobItemAssignmentApp
 	MaterialApp                *MaterialApp
 	OverIssueApp               *OverIssueApp
 	ScannedDataApp             *ScannedDataApp
@@ -23,6 +24,8 @@ type AppStore struct {
 	UnitOfMeasureConversionApp *UnitOfMeasureConversionApp
 	UserApp                    *UserApp
 	UserRoleApp                *UserRoleApp
+	UserCompanyApp             *UserCompanyApp
+	UserFactoryApp             *UserFactoryApp
 }
 
 func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
@@ -36,6 +39,7 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.JobApp = NewJobApp(repoStore.JobRepo)
 	appStore.JobItemApp = NewJobItemApp(repoStore.JobItemRepo)
 	appStore.JobAssignmentApp = NewJobAssignmentApp(repoStore.JobAssignmentRepo)
+	appStore.JobItemAssignmentApp = NewJobItemAssignmentApp(repoStore.JobItemAssignmentRepo)
 	appStore.MaterialApp = NewMaterialApp(repoStore.MaterialRepo)
 	appStore.OverIssueApp = NewOverIssueApp(repoStore.OverIssueRepo)
 	appStore.ScannedDataApp = NewScannedDataApp(repoStore.ScannedDataRepo)
@@ -47,5 +51,7 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.UnitOfMeasureConversionApp = NewUnitOfMeasureConversionApp(repoStore.UnitOfMeasureConversionRepo)
 	appStore.UserApp = NewUserApp(repoStore.UserRepo)
 	appStore.UserRoleApp = NewUserRoleApp(repoStore.UserRoleRepo)
+	appStore.UserCompanyApp = NewUserCompanyApp(repoStore.UserCompanyRepo)
+	appStore.UserFactoryApp = NewUserFactoryApp(repoStore.UserFactoryRepo)
 	return &appStore
 }

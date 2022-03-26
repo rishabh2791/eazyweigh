@@ -3,6 +3,8 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
+	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -20,11 +22,11 @@ type JobItem struct {
 	RequiredWeight    float32        `json:"required_weight"`
 	UpperBound        float32        `json:"upper_bound"`
 	LowerBound        float32        `json:"lower_bound"`
-	OverIssue         bool           `json:"over_issue" gorm:"default:false;"`
-	UnderIssue        bool           `json:"under_issue" gorm:"default:false;"`
 	ActualWeight      float32        `json:"actual_weight"`
+	StartTime         time.Time      `json:"start_time"`
+	EndTime           time.Time      `json:"end_time"`
 	Complete          bool           `json:"complete" gorm:"default:false;"`
-	TimeTaken         int            `json:"time_taken" gorm:"default:1;"`
+	Batch             string         `json:"batch" gorm:"size:50;"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`
@@ -37,6 +39,13 @@ func (JobItem) Tablename() string {
 
 func (jobItem *JobItem) BeforeCreate(db *gorm.DB) error {
 	jobItem.ID = uuid.New().String()
+	return nil
+}
+
+func (jobItem *JobItem) BeforeUpdate(db *gorm.DB) error {
+	if jobItem.Complete && (jobItem.Batch == "" || len(jobItem.Batch) == 0) {
+		return errors.New("Batch No Required for Material: " + jobItem.Material.Code)
+	}
 	return nil
 }
 

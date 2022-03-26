@@ -49,7 +49,14 @@ func (uomRepo *UnitOfMeasureRepo) Get(id string) (*entity.UnitOfMeasure, error) 
 func (uomRepo *UnitOfMeasureRepo) List(conditions string) ([]entity.UnitOfMeasure, error) {
 	uoms := []entity.UnitOfMeasure{}
 
-	getErr := uomRepo.DB.Preload(clause.Associations).Where(conditions).Find(&uoms).Error
+	getErr := uomRepo.DB.Preload("Factory.Address").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&uoms).Error
 	if getErr != nil {
 		return nil, getErr
 	}

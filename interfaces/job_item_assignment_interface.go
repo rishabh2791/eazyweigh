@@ -12,19 +12,19 @@ import (
 	"github.com/hashicorp/go-hclog"
 )
 
-type UOMConversionInterface struct {
+type JobItemAssignmentInterface struct {
 	appStore *application.AppStore
 	logger   hclog.Logger
 }
 
-func NewUOMConversionInterface(appStore *application.AppStore, logger hclog.Logger) *UOMConversionInterface {
-	return &UOMConversionInterface{
+func NewJobItemAssignmentInterface(appStore *application.AppStore, logger hclog.Logger) *JobItemAssignmentInterface {
+	return &JobItemAssignmentInterface{
 		appStore: appStore,
 		logger:   logger,
 	}
 }
 
-func (uomConversionInterface *UOMConversionInterface) Create(ctx *gin.Context) {
+func (jobItemAssignmentInterface *JobItemAssignmentInterface) Create(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	requestingUser, ok := ctx.Get("user")
@@ -38,7 +38,7 @@ func (uomConversionInterface *UOMConversionInterface) Create(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.UnitOfMeasureConversion{}
+	model := entity.JobItemAssignment{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -52,7 +52,7 @@ func (uomConversionInterface *UOMConversionInterface) Create(ctx *gin.Context) {
 	model.CreatedByUsername = user.Username
 	model.UpdatedByUsername = user.Username
 
-	created, creationErr := uomConversionInterface.appStore.UnitOfMeasureConversionApp.Create(&model)
+	created, creationErr := jobItemAssignmentInterface.appStore.JobItemAssignmentApp.Create(&model)
 	if creationErr != nil {
 		response.Status = false
 		response.Message = creationErr.Error()
@@ -63,13 +63,13 @@ func (uomConversionInterface *UOMConversionInterface) Create(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "UOM Conversion Created."
+	response.Message = "Job Item Assignment Created."
 	response.Payload = created
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (uomConversionInterface *UOMConversionInterface) CreateMultiple(ctx *gin.Context) {
+func (jobItemAssignmentInterface *JobItemAssignmentInterface) CreateMultiple(ctx *gin.Context) {
 	response := value_objects.Response{}
 	createdModels := []interface{}{}
 	creationErrors := []interface{}{}
@@ -85,7 +85,7 @@ func (uomConversionInterface *UOMConversionInterface) CreateMultiple(ctx *gin.Co
 	}
 	user := requestingUser.(*entity.User)
 
-	models := []entity.UnitOfMeasureConversion{}
+	models := []entity.JobItemAssignment{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
 	if jsonErr != nil {
 		response.Status = false
@@ -100,7 +100,7 @@ func (uomConversionInterface *UOMConversionInterface) CreateMultiple(ctx *gin.Co
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		_, creationErr := uomConversionInterface.appStore.UnitOfMeasureConversionApp.Create(&model)
+		_, creationErr := jobItemAssignmentInterface.appStore.JobItemAssignmentApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
@@ -109,7 +109,7 @@ func (uomConversionInterface *UOMConversionInterface) CreateMultiple(ctx *gin.Co
 	}
 
 	response.Status = true
-	response.Message = "UOM Conversions Created."
+	response.Message = "Job Item Assignments Created."
 	response.Payload = map[string]interface{}{
 		"models": createdModels,
 		"errors": creationErrors,
@@ -118,11 +118,11 @@ func (uomConversionInterface *UOMConversionInterface) CreateMultiple(ctx *gin.Co
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (uomConversionInterface *UOMConversionInterface) Get(ctx *gin.Context) {
+func (jobItemAssignmentInterface *JobItemAssignmentInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
 	id := ctx.Param("id")
 
-	uomConversion, getErr := uomConversionInterface.appStore.UnitOfMeasureConversionApp.Get(id)
+	jobItemAssignment, getErr := jobItemAssignmentInterface.appStore.JobItemAssignmentApp.Get(id)
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -133,13 +133,13 @@ func (uomConversionInterface *UOMConversionInterface) Get(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "UOM Conversion Found"
-	response.Payload = uomConversion
+	response.Message = "Job Item Assignment Found"
+	response.Payload = jobItemAssignment
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (uomConversionInterface *UOMConversionInterface) List(ctx *gin.Context) {
+func (jobItemAssignmentInterface *JobItemAssignmentInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	conditions := map[string]interface{}{}
@@ -153,7 +153,7 @@ func (uomConversionInterface *UOMConversionInterface) List(ctx *gin.Context) {
 		return
 	}
 
-	uomConversions, getErr := uomConversionInterface.appStore.UnitOfMeasureConversionApp.List(utilities.ConvertJSONToSQL(conditions))
+	jobItemAssignments, getErr := jobItemAssignmentInterface.appStore.JobItemAssignmentApp.List(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -164,8 +164,53 @@ func (uomConversionInterface *UOMConversionInterface) List(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "UOM Conversions Found"
-	response.Payload = uomConversions
+	response.Message = "Job Item Assignments Found"
+	response.Payload = jobItemAssignments
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (jobItemAssignmentInterface *JobItemAssignmentInterface) Update(ctx *gin.Context) {
+	response := value_objects.Response{}
+	id := ctx.Param("id")
+
+	requestingUser, ok := ctx.Get("user")
+	if !ok {
+		response.Status = false
+		response.Message = "Anonymous User."
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
+	}
+	user := requestingUser.(*entity.User)
+
+	model := entity.JobItemAssignment{}
+	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
+	if jsonErr != nil {
+		response.Status = false
+		response.Message = jsonErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+	model.UpdatedByUsername = user.Username
+
+	updated, updationErr := jobItemAssignmentInterface.appStore.JobItemAssignmentApp.Update(id, &model)
+	if updationErr != nil {
+		response.Status = false
+		response.Message = updationErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// Return response.
+	response.Status = true
+	response.Message = "Job Item Assignment Updated."
+	response.Payload = updated
 
 	ctx.JSON(http.StatusOK, response)
 }

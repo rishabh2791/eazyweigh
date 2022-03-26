@@ -53,7 +53,13 @@ func (bomRepo *BOMRepo) Get(id string) (*entity.BOM, error) {
 func (bomRepo *BOMRepo) List(conditions string) ([]entity.BOM, error) {
 	boms := []entity.BOM{}
 
-	getErr := bomRepo.DB.Preload(clause.Associations).Where(conditions).Find(&boms).Error
+	getErr := bomRepo.DB.Preload("Material.").
+		Preload("Material.CreatedBy").
+		Preload("Material.CreatedBy.UserRole").
+		Preload("Material.UpdatedBy").
+		Preload("Material.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory").
+		Preload(clause.Associations).Where(conditions).Find(&boms).Error
 	if getErr != nil {
 		return nil, getErr
 	}

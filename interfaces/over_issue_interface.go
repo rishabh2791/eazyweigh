@@ -35,7 +35,7 @@ func (overIssueInterface *OverIssueInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.OverIssue{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)

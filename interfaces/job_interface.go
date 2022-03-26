@@ -36,7 +36,7 @@ func (jobInterface *JobInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	model := entity.Job{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
@@ -83,7 +83,7 @@ func (jobInterface *JobInterface) CreateMultiple(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
-	user := requestingUser.(entity.User)
+	user := requestingUser.(*entity.User)
 
 	models := []entity.Job{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
@@ -100,11 +100,11 @@ func (jobInterface *JobInterface) CreateMultiple(ctx *gin.Context) {
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		created, creationErr := jobInterface.appStore.JobApp.Create(&model)
+		_, creationErr := jobInterface.appStore.JobApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 

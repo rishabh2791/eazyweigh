@@ -72,12 +72,11 @@ func (userRoleInterface *UserRoleInterface) CreateMultiple(ctx *gin.Context) {
 	}
 
 	for _, model := range models {
-
-		created, creationErr := userRoleInterface.appStore.UserRoleApp.Create(&model)
+		_, creationErr := userRoleInterface.appStore.UserRoleApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
-			createdModels = append(createdModels, created)
+			createdModels = append(createdModels, model)
 		}
 	}
 
