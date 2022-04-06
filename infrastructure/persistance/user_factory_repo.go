@@ -38,7 +38,14 @@ func (userFactoryRepo *UserFactoryRepo) Create(userFactory *entity.UserFactory) 
 
 func (userFactoryRepo *UserFactoryRepo) Get(conditions string) ([]entity.UserFactory, error) {
 	factoryUsers := []entity.UserFactory{}
-	getErr := userFactoryRepo.DB.Preload(clause.Associations).Where(conditions).Find(&factoryUsers).Error
+	getErr := userFactoryRepo.DB.
+		Preload("User.UserRole").
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&factoryUsers).Error
 	if getErr != nil {
 		return nil, getErr
 	}

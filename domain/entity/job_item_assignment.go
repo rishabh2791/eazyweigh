@@ -3,7 +3,6 @@ package entity
 import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -12,12 +11,10 @@ import (
 type JobItemAssignment struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	JobItemID         string         `json:"job_id" gorm:"size:191;not null;"`
-	JobItem           *JobItem       `json:"job"`
-	ShiftScheduleID   string         `json:"shift_schedule_id" gorm:"size:191;not null;"`
+	JobItemID         string         `json:"job_item_id" gorm:"size:191;not null;uniqueIndex:job_shift;"`
+	JobItem           *JobItem       `json:"job_item"`
+	ShiftScheduleID   string         `json:"shift_schedule_id" gorm:"size:191;not null;uniqueIndex:job_shift;"`
 	ShiftSchedule     *ShiftSchedule `json:"shift_schedule"`
-	StartTime         time.Time      `json:"start_time"`
-	EndTime           time.Time      `json:"end_time"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`

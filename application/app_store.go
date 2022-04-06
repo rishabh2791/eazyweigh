@@ -8,11 +8,12 @@ type AppStore struct {
 	BOMApp                     *BOMApp
 	BOMItemApp                 *BOMItemApp
 	CompanyApp                 *CompanyApp
+	CommonApp                  *CommonApp
 	FactoryApp                 *FactoryApp
 	JobApp                     *JobApp
 	JobItemApp                 *JobItemApp
-	JobAssignmentApp           *JobAssignmentApp
 	JobItemAssignmentApp       *JobItemAssignmentApp
+	JobItemWeighingApp         *JobItemWeighingApp
 	MaterialApp                *MaterialApp
 	OverIssueApp               *OverIssueApp
 	ScannedDataApp             *ScannedDataApp
@@ -24,6 +25,7 @@ type AppStore struct {
 	UnitOfMeasureConversionApp *UnitOfMeasureConversionApp
 	UserApp                    *UserApp
 	UserRoleApp                *UserRoleApp
+	UserRoleAccessApp          *UserRoleAccessApp
 	UserCompanyApp             *UserCompanyApp
 	UserFactoryApp             *UserFactoryApp
 }
@@ -35,11 +37,12 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.BOMApp = NewBOMApp(repoStore.BOMRepo)
 	appStore.BOMItemApp = NewBOMItemApp(repoStore.BOMItemRepo)
 	appStore.CompanyApp = NewCompanyApp(repoStore.CompanyRepo)
+	appStore.CommonApp = NewCommonApp(repoStore.CommonRepo)
 	appStore.FactoryApp = NewFactoryRepository(repoStore.FactoryRepo)
 	appStore.JobApp = NewJobApp(repoStore.JobRepo)
 	appStore.JobItemApp = NewJobItemApp(repoStore.JobItemRepo)
-	appStore.JobAssignmentApp = NewJobAssignmentApp(repoStore.JobAssignmentRepo)
 	appStore.JobItemAssignmentApp = NewJobItemAssignmentApp(repoStore.JobItemAssignmentRepo)
+	appStore.JobItemWeighingApp = NewJobItemWeighingApp(repoStore.JobItemWeighingRepo)
 	appStore.MaterialApp = NewMaterialApp(repoStore.MaterialRepo)
 	appStore.OverIssueApp = NewOverIssueApp(repoStore.OverIssueRepo)
 	appStore.ScannedDataApp = NewScannedDataApp(repoStore.ScannedDataRepo)
@@ -51,6 +54,7 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.UnitOfMeasureConversionApp = NewUnitOfMeasureConversionApp(repoStore.UnitOfMeasureConversionRepo)
 	appStore.UserApp = NewUserApp(repoStore.UserRepo)
 	appStore.UserRoleApp = NewUserRoleApp(repoStore.UserRoleRepo)
+	appStore.UserRoleAccessApp = NewUserRoleAccessApp(repoStore.UserRoleAccessRepo)
 	appStore.UserCompanyApp = NewUserCompanyApp(repoStore.UserCompanyRepo)
 	appStore.UserFactoryApp = NewUserFactoryApp(repoStore.UserFactoryRepo)
 	return &appStore

@@ -57,7 +57,6 @@ func (auth *AuthMiddleware) ValidateUser() gin.HandlerFunc {
 func (auth *AuthMiddleware) ValidateAccessToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		response := value_objects.Response{}
-		ctx.Header("Content-Type", "application/json")
 
 		token, err := extractToken(ctx.Request)
 		if err != nil {

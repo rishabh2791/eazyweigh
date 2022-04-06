@@ -20,12 +20,13 @@ type RepoStore struct {
 	AuthRepo                    *AuthRepo
 	BOMRepo                     *BOMRepo
 	BOMItemRepo                 *BOMItemRepo
+	CommonRepo                  *CommonRepo
 	CompanyRepo                 *CompanyRepo
 	FactoryRepo                 *FactoryRepo
 	JobRepo                     *JobRepo
 	JobItemRepo                 *JobItemRepo
-	JobAssignmentRepo           *JobAssignmentRepo
 	JobItemAssignmentRepo       *JobItemAssignmentRepo
+	JobItemWeighingRepo         *JobItemWeighingRepo
 	MaterialRepo                *MaterialRepo
 	OverIssueRepo               *OverIssueRepo
 	ScannedDataRepo             *ScannedDataRepo
@@ -37,6 +38,7 @@ type RepoStore struct {
 	UnitOfMeasureConversionRepo *UnitOfMeasureConversionRepo
 	UserRepo                    *UserRepo
 	UserRoleRepo                *UserRoleRepo
+	UserRoleAccessRepo          *UserRoleAccessRepo
 	UserCompanyRepo             *UserCompanyRepo
 	UserFactoryRepo             *UserFactoryRepo
 }
@@ -74,11 +76,12 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.BOMItemRepo = NewBOMItemRepo(gormDB, logging)
 	repoStore.BOMRepo = NewBOMRepo(gormDB, logging, repoStore.BOMItemRepo)
 	repoStore.CompanyRepo = NewCompanyRepo(gormDB, logging)
+	repoStore.CommonRepo = NewCommonRepo(gormDB, logging)
 	repoStore.FactoryRepo = NewFactoryRepo(gormDB, logging)
 	repoStore.JobRepo = NewJobRepo(gormDB, logging)
 	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
-	repoStore.JobAssignmentRepo = NewJobAssignmentRepo(gormDB, logging)
 	repoStore.JobItemAssignmentRepo = NewJobItemAssignmentRepo(gormDB, logging)
+	repoStore.JobItemWeighingRepo = NewJobItemWeighingRepo(gormDB, logging)
 	repoStore.MaterialRepo = NewMaterialRepo(gormDB, logging)
 	repoStore.OverIssueRepo = NewOverIssueRepo(gormDB, logging)
 	repoStore.ScannedDataRepo = NewScannedDataRepo(gormDB, logging)
@@ -90,6 +93,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.UnitOfMeasureConversionRepo = NewUnitOfMeasureConversionRepo(gormDB, logging)
 	repoStore.UserRepo = NewUserRepo(gormDB, logging)
 	repoStore.UserRoleRepo = NewUserRoleRepo(gormDB, logging)
+	repoStore.UserRoleAccessRepo = NewUserRoleAccessRepo(gormDB, logging)
 	repoStore.UserCompanyRepo = NewUserCompanyRepo(gormDB, logging)
 	repoStore.UserFactoryRepo = NewUserFactoryRepo(gormDB, logging)
 
@@ -119,9 +123,10 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.JobItem{},
 		&entity.Shift{},
 		&entity.ShiftSchedule{},
-		&entity.JobAssignment{},
 		&entity.JobItemAssignment{},
+		&entity.JobItemWeighing{},
 		&entity.OverIssue{},
 		&entity.UnderIssue{},
+		&entity.ScannedData{},
 	)
 }

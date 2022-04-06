@@ -49,7 +49,30 @@ func (conversionRepo *UnitOfMeasureConversionRepo) Get(id string) (*entity.UnitO
 func (conversionRepo *UnitOfMeasureConversionRepo) List(conditions string) ([]entity.UnitOfMeasureConversion, error) {
 	conversions := []entity.UnitOfMeasureConversion{}
 
-	getErr := conversionRepo.DB.Preload(clause.Associations).Where(conditions).Find(&conversions).Error
+	getErr := conversionRepo.DB.
+		Preload("UnitOfMeasure1.Factory").
+		Preload("UnitOfMeasure1.Factory.Address").
+		Preload("UnitOfMeasure1.Factory.CreatedBy").
+		Preload("UnitOfMeasure1.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure1.Factory.UpdatedBy").
+		Preload("UnitOfMeasure1.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure1.CreatedBy").
+		Preload("UnitOfMeasure1.CreatedBy.UserRole").
+		Preload("UnitOfMeasure1.UpdatedBy").
+		Preload("UnitOfMeasure1.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure2.Factory").
+		Preload("UnitOfMeasure2.Factory.Address").
+		Preload("UnitOfMeasure2.Factory.CreatedBy").
+		Preload("UnitOfMeasure2.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure2.Factory.UpdatedBy").
+		Preload("UnitOfMeasure2.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure2.CreatedBy").
+		Preload("UnitOfMeasure2.CreatedBy.UserRole").
+		Preload("UnitOfMeasure2.UpdatedBy").
+		Preload("UnitOfMeasure2.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&conversions).Error
 	if getErr != nil {
 		return nil, getErr
 	}

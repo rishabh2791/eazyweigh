@@ -51,7 +51,8 @@ func (factoryRepo *FactoryRepo) Get(id string) (*entity.Factory, error) {
 func (factoryRepo *FactoryRepo) List(conditions string) ([]entity.Factory, error) {
 	factories := []entity.Factory{}
 
-	getErr := factoryRepo.DB.Preload("CreatedBy.UserRole").Preload("UpdatedBy.UserRole").Preload(clause.Associations).Where(conditions).Find(&factories).Error
+	getErr := factoryRepo.DB.
+		Preload("CreatedBy.UserRole").Preload("UpdatedBy.UserRole").Preload(clause.Associations).Where(conditions).Find(&factories).Error
 	if getErr != nil {
 		return nil, getErr
 	}

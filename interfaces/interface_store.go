@@ -14,11 +14,12 @@ type InterfaceStore struct {
 	BOMInterface               *BOMInterface
 	BOMItemInterface           *BOMItemInterface
 	CompanyInterface           *CompanyInterface
+	CommonInterface            *CommonInterface
 	FactoryInterface           *FactoryInterface
 	JobInterface               *JobInterface
-	JobAssignmentInterface     *JobAssignmentInterface
 	JobItemInterface           *JobItemInterface
 	JobItemAssignmentInterface *JobItemAssignmentInterface
+	JobItemWeighingInterface   *JobItemWeighingInterface
 	MaterialInterface          *MaterialInterface
 	OverIssueInterface         *OverIssueInterface
 	ScannedDataInterface       *ScannedDataInterface
@@ -30,6 +31,7 @@ type InterfaceStore struct {
 	UOMConversionInterface     *UOMConversionInterface
 	UserInterface              *UserInterface
 	UserRoleInterface          *UserRoleInterface
+	UserRoleAccessInterface    *UserRoleAccessInterface
 	UserCompanyInterface       *UserCompanyInterface
 	UserFactoryInterface       *UserFactoryInterface
 }
@@ -43,11 +45,12 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.BOMInterface = NewBOMInterface(appStore, logger)
 	interfaceStore.BOMItemInterface = NewBOMItemInterface(appStore, logger)
 	interfaceStore.CompanyInterface = NewCompanyInterface(appStore, logger)
+	interfaceStore.CommonInterface = NewCommonInterface(appStore, logger)
 	interfaceStore.FactoryInterface = NewFactoryInterface(appStore, logger)
 	interfaceStore.JobInterface = NewJobInterface(appStore, logger)
 	interfaceStore.JobItemInterface = NewJobItemInterface(appStore, logger)
-	interfaceStore.JobAssignmentInterface = NewJobAssignmentInterface(appStore, logger)
 	interfaceStore.JobItemAssignmentInterface = NewJobItemAssignmentInterface(appStore, logger)
+	interfaceStore.JobItemWeighingInterface = NewJobItemWeighingInterface(appStore, logger)
 	interfaceStore.MaterialInterface = NewMaterialInterface(appStore, logger)
 	interfaceStore.OverIssueInterface = NewOverIssueInterface(appStore, logger)
 	interfaceStore.ScannedDataInterface = NewScannedDataInterface(appStore, logger)
@@ -59,6 +62,7 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.UOMConversionInterface = NewUOMConversionInterface(appStore, logger)
 	interfaceStore.UserInterface = NewUserInterface(appStore, logger)
 	interfaceStore.UserRoleInterface = NewUserRoleInterface(appStore, logger)
+	interfaceStore.UserRoleAccessInterface = NewUserRoleAccessInterface(appStore, logger)
 	interfaceStore.UserCompanyInterface = NewUserCompanyInterface(appStore, logger)
 	interfaceStore.UserFactoryInterface = NewUserFactoryInterface(appStore, logger)
 	return &interfaceStore

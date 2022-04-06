@@ -15,7 +15,6 @@ type Material struct {
 	FactoryID         string         `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_material;"`
 	Code              string         `json:"code" gorm:"size:20;not null;uniqueIndex:factory_material;"`
 	Description       string         `json:"description" gorm:"size:200;not null;"`
-	BarCode           string         `json:"bar_code" gorm:"size:20;not null;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
@@ -43,9 +42,6 @@ func (material *Material) Validate() error {
 	}
 	if material.Description == "" || len(material.Description) == 0 {
 		errors["description"] = "Material Description Required."
-	}
-	if material.BarCode == "" || len(material.BarCode) == 0 {
-		errors["bar_code"] = "Bar Code Required."
 	}
 	if material.FactoryID == "" || len(material.FactoryID) == 0 {
 		errors["factory"] = "Factory Details Required."

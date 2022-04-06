@@ -146,7 +146,7 @@ type tokenConfig struct {
 
 func NewTokenConfig() *tokenConfig {
 	return &tokenConfig{
-		JWTExpiration:     10 * 2,
+		JWTExpiration:     1,
 		RefreshExpiration: 7,
 	}
 }

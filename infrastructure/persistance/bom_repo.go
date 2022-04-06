@@ -54,11 +54,64 @@ func (bomRepo *BOMRepo) List(conditions string) ([]entity.BOM, error) {
 	boms := []entity.BOM{}
 
 	getErr := bomRepo.DB.Preload("Material.").
+		Preload("Material.UnitOfMeasure").
+		Preload("Material.UnitOfMeasure.Factory").
+		Preload("Material.UnitOfMeasure.Factory.Address").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.CreatedBy").
+		Preload("Material.UnitOfMeasure.UpdatedBy").
+		Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
 		Preload("Material.CreatedBy").
 		Preload("Material.CreatedBy.UserRole").
 		Preload("Material.UpdatedBy").
 		Preload("Material.UpdatedBy.UserRole").
+		Preload("BOMItems.Material.").
+		Preload("BOMItems.Material.UnitOfMeasure").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory.Address").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("BOMItems.Material.UnitOfMeasure.CreatedBy").
+		Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy").
+		Preload("BOMItems.Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("BOMItems.Material.CreatedBy").
+		Preload("BOMItems.Material.CreatedBy.UserRole").
+		Preload("BOMItems.Material.UpdatedBy").
+		Preload("BOMItems.Material.UpdatedBy.UserRole").
+		Preload("BOMItems.UnitOfMeasure").
+		Preload("BOMItems.UnitOfMeasure.Factory").
+		Preload("BOMItems.UnitOfMeasure.Factory.Address").
+		Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy").
+		Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("BOMItems.UnitOfMeasure.CreatedBy").
+		Preload("BOMItems.UnitOfMeasure.UpdatedBy").
+		Preload("BOMItems.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("BOMItems.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("BOMItems.CreatedBy").
+		Preload("BOMItems.UpdatedBy").
+		Preload("BOMItems.CreatedBy.UserRole").
+		Preload("BOMItems.UpdatedBy.UserRole").
 		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
 		Preload(clause.Associations).Where(conditions).Find(&boms).Error
 	if getErr != nil {
 		return nil, getErr

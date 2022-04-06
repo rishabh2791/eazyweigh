@@ -11,14 +11,17 @@ import (
 type Job struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	JobCode           string         `json:"job_code" gorm:"size:10;not null;"`
-	MaterialID        string         `json:"material_code" gorm:"size:191;not null;"`
+	JobCode           string         `json:"job_code" gorm:"size:10;not null;uniqueIndex:factory_job;"`
+	FactoryID         string         `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_job;"`
+	Factory           *Factory       `json:"factory"`
+	MaterialID        string         `json:"material_id" gorm:"size:191;not null;"`
 	Material          *Material      `json:"material"`
 	Quantity          float32        `json:"quantity" gorm:"default:0.0;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
 	JobItems          []JobItem      `json:"job_items"`
 	Processing        bool           `json:"processing" gorm:"default:false;"`
+	Complete          bool           `json:"complete" gorm:"default:false;"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`
@@ -55,10 +58,12 @@ func (job *Job) Validate() error {
 }
 
 func (job *Job) IsIncomplete() bool {
+	var complete bool
+	complete = true
 	for _, jobItem := range job.JobItems {
-		if !jobItem.Complete {
-			return true
+		if jobItem.IsComplete() {
+			complete = complete && true
 		}
 	}
-	return false
+	return complete
 }

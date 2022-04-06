@@ -51,7 +51,21 @@ func (shift *ShiftScheduleRepo) Get(username string) ([]entity.ShiftSchedule, er
 func (shift *ShiftScheduleRepo) List(conditions string) ([]entity.ShiftSchedule, error) {
 	shiftSchedule := []entity.ShiftSchedule{}
 
-	getErr := shift.DB.Preload(clause.Associations).Where(conditions).Find(&shiftSchedule).Error
+	getErr := shift.DB.
+		Preload("User.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("Shift.CreatedBy").
+		Preload("Shift.CreatedBy.UserRole").
+		Preload("Shift.UpdatedBy").
+		Preload("Shift.UpdatedBy.UserRole").
+		Preload("Shift.Factory").
+		Preload("Shift.Factory.Address").
+		Preload("Shift.Factory.CreatedBy").
+		Preload("Shift.Factory.CreatedBy.UserRole").
+		Preload("Shift.Factory.UpdatedBy").
+		Preload("Shift.Factory.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&shiftSchedule).Error
 	if getErr != nil {
 		return nil, getErr
 	}

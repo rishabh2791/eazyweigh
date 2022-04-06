@@ -4,7 +4,6 @@ import (
 	"eazyweigh/application"
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/value_objects"
-	"eazyweigh/infrastructure/utilities"
 	"encoding/json"
 	"net/http"
 
@@ -12,19 +11,19 @@ import (
 	"github.com/hashicorp/go-hclog"
 )
 
-type JobAssignmentInterface struct {
+type UserRoleAccessInterface struct {
 	appStore *application.AppStore
 	logger   hclog.Logger
 }
 
-func NewJobAssignmentInterface(appStore *application.AppStore, logger hclog.Logger) *JobAssignmentInterface {
-	return &JobAssignmentInterface{
+func NewUserRoleAccessInterface(appStore *application.AppStore, logger hclog.Logger) *UserRoleAccessInterface {
+	return &UserRoleAccessInterface{
 		appStore: appStore,
 		logger:   logger,
 	}
 }
 
-func (jobAssignmentInterface *JobAssignmentInterface) Create(ctx *gin.Context) {
+func (userRoleAccessInterface *UserRoleAccessInterface) Create(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	requestingUser, ok := ctx.Get("user")
@@ -38,7 +37,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Create(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.JobAssignment{}
+	model := entity.UserRoleAccess{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -52,7 +51,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Create(ctx *gin.Context) {
 	model.CreatedByUsername = user.Username
 	model.UpdatedByUsername = user.Username
 
-	created, creationErr := jobAssignmentInterface.appStore.JobAssignmentApp.Create(&model)
+	created, creationErr := userRoleAccessInterface.appStore.UserRoleAccessApp.Create(&model)
 	if creationErr != nil {
 		response.Status = false
 		response.Message = creationErr.Error()
@@ -63,13 +62,13 @@ func (jobAssignmentInterface *JobAssignmentInterface) Create(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Job Assignment Created."
+	response.Message = "User Role Access Created."
 	response.Payload = created
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Context) {
+func (userRoleAccessInterface *UserRoleAccessInterface) CreateMultiple(ctx *gin.Context) {
 	response := value_objects.Response{}
 	createdModels := []interface{}{}
 	creationErrors := []interface{}{}
@@ -85,7 +84,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 	}
 	user := requestingUser.(*entity.User)
 
-	models := []entity.JobAssignment{}
+	models := []entity.UserRoleAccess{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
 	if jsonErr != nil {
 		response.Status = false
@@ -100,7 +99,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 		model.CreatedByUsername = user.Username
 		model.UpdatedByUsername = user.Username
 
-		_, creationErr := jobAssignmentInterface.appStore.JobAssignmentApp.Create(&model)
+		_, creationErr := userRoleAccessInterface.appStore.UserRoleAccessApp.Create(&model)
 		if creationErr != nil {
 			creationErrors = append(creationErrors, creationErr)
 		} else {
@@ -109,7 +108,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 	}
 
 	response.Status = true
-	response.Message = "Job Assignments Created."
+	response.Message = "User Role Accesses Created."
 	response.Payload = map[string]interface{}{
 		"models": createdModels,
 		"errors": creationErrors,
@@ -118,11 +117,11 @@ func (jobAssignmentInterface *JobAssignmentInterface) CreateMultiple(ctx *gin.Co
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobAssignmentInterface *JobAssignmentInterface) Get(ctx *gin.Context) {
+func (userRoleAccessInterface *UserRoleAccessInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
-	id := ctx.Param("id")
+	userRole := ctx.Param("user_role")
 
-	jobAssignment, getErr := jobAssignmentInterface.appStore.JobAssignmentApp.Get(id)
+	accesses, getErr := userRoleAccessInterface.appStore.UserRoleAccessApp.List(userRole)
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -133,46 +132,15 @@ func (jobAssignmentInterface *JobAssignmentInterface) Get(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Job Assignment Found"
-	response.Payload = jobAssignment
+	response.Message = "User Role Accesses Found"
+	response.Payload = accesses
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobAssignmentInterface *JobAssignmentInterface) List(ctx *gin.Context) {
+func (userRoleAccessInterface *UserRoleAccessInterface) Update(ctx *gin.Context) {
 	response := value_objects.Response{}
-
-	conditions := map[string]interface{}{}
-	jsonError := json.NewDecoder(ctx.Request.Body).Decode(&conditions)
-	if jsonError != nil {
-		response.Status = false
-		response.Message = jsonError.Error()
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-
-	jobAssignments, getErr := jobAssignmentInterface.appStore.JobAssignmentApp.List(utilities.ConvertJSONToSQL(conditions))
-	if getErr != nil {
-		response.Status = false
-		response.Message = getErr.Error()
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-
-	response.Status = true
-	response.Message = "job Assignments Found"
-	response.Payload = jobAssignments
-
-	ctx.JSON(http.StatusOK, response)
-}
-
-func (jobAssignmentInterface *JobAssignmentInterface) Update(ctx *gin.Context) {
-	response := value_objects.Response{}
-	id := ctx.Param("id")
+	userRole := ctx.Param("user_role")
 
 	requestingUser, ok := ctx.Get("user")
 	if !ok {
@@ -185,7 +153,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Update(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.JobAssignment{}
+	model := entity.UserRoleAccess{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -197,7 +165,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Update(ctx *gin.Context) {
 	}
 	model.UpdatedByUsername = user.Username
 
-	updated, updationErr := jobAssignmentInterface.appStore.JobAssignmentApp.Update(id, &model)
+	updated, updationErr := userRoleAccessInterface.appStore.UserRoleAccessApp.Update(userRole, &model)
 	if updationErr != nil {
 		response.Status = false
 		response.Message = updationErr.Error()
@@ -209,7 +177,7 @@ func (jobAssignmentInterface *JobAssignmentInterface) Update(ctx *gin.Context) {
 
 	// Return response.
 	response.Status = true
-	response.Message = "Job Assignment Updated."
+	response.Message = "User Role Access Updated."
 	response.Payload = updated
 
 	ctx.JSON(http.StatusOK, response)

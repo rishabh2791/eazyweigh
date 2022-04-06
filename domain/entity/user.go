@@ -19,6 +19,7 @@ type User struct {
 	Email             string    `json:"email" gorm:"size:100;not null;unique;"`
 	UserRoleID        string    `json:"user_role_id" gorm:"size:191;not null;"`
 	UserRole          *UserRole `json:"user_role"`
+	ProfilePic        string    `json:"profile_pic" gorm:"size:500;not null;default'public/profile_pics/default.jpg'"`
 	SecretKey         string    `json:"-" gorm:"size:191;not null;unique;"`
 	Active            bool      `json:"active" gorm:"default:true;"`
 	CreatedByUsername string    `json:"created_by_username" gorm:"size:20;not null;"`

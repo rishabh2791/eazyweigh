@@ -13,6 +13,7 @@ type ScannedData struct {
 	ID           string `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
 	ActualCode   string `json:"actual_code" gorm:"size:1000;not null;"`
 	ExpectedCode string `json:"expected_code" gorm:"size:1000;not null;"`
+	TerminalID   string `json:"terminal_id" gorm:"size:191;not null;"`
 	UserUsername string `json:"user_username" gorm:"size:20;not null;"`
 	User         *User  `json:"user"`
 	JobID        string `json:"job_id" gorm:"size:191;not null;"`

@@ -49,7 +49,20 @@ func (terminalRepo *TerminalRepo) Get(id string) (*entity.Terminal, error) {
 
 func (terminalRepo *TerminalRepo) List(conditions string) ([]entity.Terminal, error) {
 	terminals := []entity.Terminal{}
-	getErr := terminalRepo.DB.Preload(clause.Associations).Where(conditions).Find(&terminals).Error
+	getErr := terminalRepo.DB.
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&terminals).Error
 	if getErr != nil {
 		return nil, getErr
 	}
