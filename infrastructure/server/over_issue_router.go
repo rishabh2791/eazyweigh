@@ -25,6 +25,4 @@ func (overIssueRouter *OverIssueRouter) ServeRoutes() {
 	overIssueRouter.router.POST("/create/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Create)
 	overIssueRouter.router.GET("/:id/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.List)
 	overIssueRouter.router.PATCH("/:id/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Update)
-	overIssueRouter.router.PATCH("/:id/approve/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Approve)
-	overIssueRouter.router.PATCH("/:id/reject/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Reject)
 }

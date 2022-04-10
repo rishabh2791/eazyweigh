@@ -24,14 +24,24 @@ func NewUserRoleAccessRepo(db *gorm.DB, logger hclog.Logger) *UserRoleAccessRepo
 }
 
 func (userRoleAccessRepo *UserRoleAccessRepo) Create(userRoleAccess *entity.UserRoleAccess) (*entity.UserRoleAccess, error) {
-	validationErr := userRoleAccess.Validate()
-	if validationErr != nil {
-		return nil, validationErr
-	}
+	existingUserRoleAccess := []entity.UserRoleAccess{}
+	userRoleAccessRepo.DB.Preload(clause.Associations).Where("user_role_role = ? AND table_name = ?", userRoleAccess.UserRoleRole, userRoleAccess.TableName).Take(&existingUserRoleAccess)
 
-	creationErr := userRoleAccessRepo.DB.Create(&userRoleAccess).Error
-	if creationErr != nil {
-		return nil, creationErr
+	if len(existingUserRoleAccess) == 0 {
+		validationErr := userRoleAccess.Validate()
+		if validationErr != nil {
+			return nil, validationErr
+		}
+
+		creationErr := userRoleAccessRepo.DB.Create(&userRoleAccess).Error
+		if creationErr != nil {
+			return nil, creationErr
+		}
+	} else {
+		updationErr := userRoleAccessRepo.DB.Table(entity.UserRoleAccess{}.Tablename()).Where("user_role_role = ? AND table_name = ?", userRoleAccess.UserRoleRole, userRoleAccess.TableName).Updates(userRoleAccess).Error
+		if updationErr != nil {
+			return nil, updationErr
+		}
 	}
 
 	return userRoleAccess, nil

@@ -3,17 +3,21 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/infrastructure/config"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 type RepoStore struct {
 	DB                          *gorm.DB
+	WarehouseDB                 *gorm.DB
 	Cache                       *redis.Client
 	Logger                      hclog.Logger
 	AddressRepo                 *AddressRepo
@@ -67,6 +71,17 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	sqlDB, _ := gormDB.DB()
 	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetMaxOpenConns(10000)
+
+	// MSSQL Connection
+	username := url.QueryEscape(dbConfig.WarehouseUser)
+	password := strings.ReplaceAll(url.QueryEscape(dbConfig.WarehousePassword), "%24", "_")
+	sqlURL := "sqlserver://" + username + ":" + password + "@" + dbConfig.WarehouseHost + "?database=" + dbConfig.WarehouseDBName
+	remoteSQLDB, sqlErr := gorm.Open(sqlserver.Open(sqlURL), &gorm.Config{})
+	if sqlErr != nil {
+		print(sqlErr)
+		return nil, sqlErr
+	}
+	repoStore.WarehouseDB = remoteSQLDB
 
 	repoStore.DB = gormDB
 	repoStore.Logger = logging

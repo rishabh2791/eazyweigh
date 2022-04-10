@@ -60,11 +60,15 @@ func (conf *ServerConfig) GetTokenConfig() *tokenConfig {
 }
 
 type databaseConfig struct {
-	DbHost     string
-	DbPort     string
-	DbName     string
-	DbUser     string
-	DbPassword string
+	DbHost            string
+	DbPort            string
+	DbName            string
+	DbUser            string
+	DbPassword        string
+	WarehouseHost     string
+	WarehouseDBName   string
+	WarehouseUser     string
+	WarehousePassword string
 }
 
 func NewDatabaseConfig() *databaseConfig {
@@ -93,6 +97,26 @@ func NewDatabaseConfig() *databaseConfig {
 		dbConf.DbName = os.Getenv("eazyweigh_database_name")
 	} else {
 		dbConf.DbName = defaultsettings["db_name"]
+	}
+	if os.Getenv("warehouse_database_server") != "" || len(os.Getenv("warehouse_database_server")) != 0 {
+		dbConf.WarehouseHost = os.Getenv("warehouse_database_server")
+	} else {
+		dbConf.WarehouseHost = "localhost"
+	}
+	if os.Getenv("warehouse_username") != "" || len(os.Getenv("warehouse_username")) != 0 {
+		dbConf.WarehouseUser = os.Getenv("warehouse_username")
+	} else {
+		dbConf.WarehouseUser = ""
+	}
+	if os.Getenv("warehouse_password") != "" || len(os.Getenv("warehouse_password")) != 0 {
+		dbConf.WarehousePassword = os.Getenv("warehouse_password")
+	} else {
+		dbConf.WarehousePassword = ""
+	}
+	if os.Getenv("warehouse_database_name") != "" || len(os.Getenv("warehouse_database_name")) != 0 {
+		dbConf.WarehouseDBName = os.Getenv("warehouse_database_name")
+	} else {
+		dbConf.WarehouseDBName = ""
 	}
 	return &dbConf
 }

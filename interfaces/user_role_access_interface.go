@@ -5,6 +5,7 @@ import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/value_objects"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -101,6 +102,7 @@ func (userRoleAccessInterface *UserRoleAccessInterface) CreateMultiple(ctx *gin.
 
 		_, creationErr := userRoleAccessInterface.appStore.UserRoleAccessApp.Create(&model)
 		if creationErr != nil {
+			log.Println(creationErr)
 			creationErrors = append(creationErrors, creationErr)
 		} else {
 			createdModels = append(createdModels, model)

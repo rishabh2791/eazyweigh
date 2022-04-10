@@ -24,6 +24,7 @@ type JobItem struct {
 	JobItemWeighing   []JobItemWeighing `json:"job_item_weighing"`
 	Assigned          bool              `json:"assigned" gorm:"default:false;"`
 	Complete          bool              `json:"complete" gorm:"default:false;"`
+	Verified          bool              `json:"verified" gorm:"default:false;"`
 	CreatedByUsername string            `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User             `json:"created_by"`
 	UpdatedByUsername string            `json:"updated_by_username" gorm:"size:20;not null;"`

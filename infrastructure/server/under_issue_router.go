@@ -25,6 +25,4 @@ func (underIssueRouter *UnderIssueRouter) ServeRoutes() {
 	underIssueRouter.router.POST("/create/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Create)
 	underIssueRouter.router.GET("/:id/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.List)
 	underIssueRouter.router.PATCH("/:id/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Update)
-	underIssueRouter.router.PATCH("/:id/approve/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Approve)
-	underIssueRouter.router.PATCH("/:id/reject/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Reject)
 }
