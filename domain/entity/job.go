@@ -33,7 +33,9 @@ func (Job) Tablename() string {
 }
 
 func (job *Job) BeforeCreate(db *gorm.DB) error {
-	job.ID = uuid.New().String()
+	if job.ID == "" || len(job.ID) == 0 {
+		job.ID = uuid.New().String()
+	}
 	return nil
 }
 

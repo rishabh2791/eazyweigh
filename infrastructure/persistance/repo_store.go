@@ -5,7 +5,6 @@ import (
 	"eazyweigh/infrastructure/config"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/hashicorp/go-hclog"
@@ -74,11 +73,14 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 
 	// MSSQL Connection
 	username := url.QueryEscape(dbConfig.WarehouseUser)
-	password := strings.ReplaceAll(url.QueryEscape(dbConfig.WarehousePassword), "%24", "_")
-	sqlURL := "sqlserver://" + username + ":" + password + "@" + dbConfig.WarehouseHost + "?database=" + dbConfig.WarehouseDBName
-	remoteSQLDB, sqlErr := gorm.Open(sqlserver.Open(sqlURL), &gorm.Config{})
+	password := url.QueryEscape(dbConfig.WarehousePassword)
+	sqlURL := "sqlserver://" + username + ":" + password + "@" + dbConfig.WarehouseHost + ":1433?database=" + dbConfig.WarehouseDBName
+	remoteSQLDB, sqlErr := gorm.Open(sqlserver.Open(sqlURL), &gorm.Config{
+		Logger:               logger.Default.LogMode(logger.Silent),
+		QueryFields:          true,
+		FullSaveAssociations: true,
+	})
 	if sqlErr != nil {
-		print(sqlErr)
 		return nil, sqlErr
 	}
 	repoStore.WarehouseDB = remoteSQLDB
@@ -93,7 +95,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.CompanyRepo = NewCompanyRepo(gormDB, logging)
 	repoStore.CommonRepo = NewCommonRepo(gormDB, logging)
 	repoStore.FactoryRepo = NewFactoryRepo(gormDB, logging)
-	repoStore.JobRepo = NewJobRepo(gormDB, logging)
+	repoStore.JobRepo = NewJobRepo(gormDB, remoteSQLDB, logging)
 	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
 	repoStore.JobItemAssignmentRepo = NewJobItemAssignmentRepo(gormDB, logging)
 	repoStore.JobItemWeighingRepo = NewJobItemWeighingRepo(gormDB, logging)

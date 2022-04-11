@@ -11,14 +11,14 @@ import (
 type BOM struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	FactoryID         string         `json:"factory_id" gorm:"size:191;not null;"`
-	MaterialID        string         `json:"material_id" gorm:"size:191;not null;uniqueIndex:material_revision;"`
+	FactoryID         string         `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_material_revision;"`
+	MaterialID        string         `json:"material_id" gorm:"size:191;not null;uniqueIndex:factory_material_revision;"`
 	Material          *Material      `json:"material"`
 	BOMItems          []BOMItem      `json:"bom_items"`
 	UnitSize          float32        `json:"unit_size" gorm:"default:1000;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
-	Revision          int            `json:"revision" gorm:"default:1;uniqueIndex:material_revision;"`
+	Revision          int            `json:"revision" gorm:"default:1;uniqueIndex:factory_material_revision;"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`
@@ -30,7 +30,9 @@ func (BOM) Tablename() string {
 }
 
 func (bom *BOM) BeforeCreate(db *gorm.DB) error {
-	bom.ID = uuid.New().String()
+	if bom.ID == "" || len(bom.ID) == 0 {
+		bom.ID = uuid.New().String()
+	}
 	return nil
 }
 
