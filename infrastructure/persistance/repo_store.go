@@ -75,14 +75,14 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	username := url.QueryEscape(dbConfig.WarehouseUser)
 	password := url.QueryEscape(dbConfig.WarehousePassword)
 	sqlURL := "sqlserver://" + username + ":" + password + "@" + dbConfig.WarehouseHost + ":1433?database=" + dbConfig.WarehouseDBName
-	remoteSQLDB, sqlErr := gorm.Open(sqlserver.Open(sqlURL), &gorm.Config{
+	remoteSQLDB, _ := gorm.Open(sqlserver.Open(sqlURL), &gorm.Config{
 		Logger:               logger.Default.LogMode(logger.Silent),
 		QueryFields:          true,
 		FullSaveAssociations: true,
 	})
-	if sqlErr != nil {
-		return nil, sqlErr
-	}
+	// if sqlErr != nil {
+	// 	return nil, sqlErr
+	// }
 	repoStore.WarehouseDB = remoteSQLDB
 
 	repoStore.DB = gormDB

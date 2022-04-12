@@ -182,12 +182,30 @@ func (auth *AuthRepo) GenerateAuth(token *value_objects.Token) error {
 	at := time.Unix(token.ATExpires, 0)
 	rt := time.Unix(token.RTExpires, 0)
 	now := time.Now()
+	existingAuth, existingAuthErr := auth.FetchAuth(token.Username + "_access")
+	if existingAuthErr == nil {
+		auth.DeleteAuth(existingAuth)
+		auth.DeleteAuth(token.Username + "_access")
+	}
+	_, existingRefreshErr := auth.FetchAuth(token.Username + "_refresh")
+	if existingRefreshErr == nil {
+		auth.DeleteAuth(token.Username + "_refresh")
+
+	}
 	accessErr := auth.RedisClient.Set(token.AccessUUID, token.Username, at.Sub(now)).Err()
 	if accessErr != nil {
 		return accessErr
 	}
+	accessReverseErr := auth.RedisClient.Set(token.Username+"_access", token.AccessUUID, at.Sub(now)).Err()
+	if accessReverseErr != nil {
+		return accessErr
+	}
 	refreshErr := auth.RedisClient.Set(token.RefreshUUID, token.Username, rt.Sub(now)).Err()
 	if refreshErr != nil {
+		return refreshErr
+	}
+	refreshReverseErr := auth.RedisClient.Set(token.Username+"_refresh", token.RefreshUUID, rt.Sub(now)).Err()
+	if refreshReverseErr != nil {
 		return refreshErr
 	}
 	return nil
@@ -209,9 +227,17 @@ func (auth *AuthRepo) FetchAuth(uuid string) (string, error) {
 }
 
 func (auth *AuthRepo) DeleteAuth(uuid string) (int64, error) {
-	deleted, err := auth.RedisClient.Del(uuid).Result()
+	username, err := auth.RedisClient.Get(uuid).Result()
 	if err != nil {
 		return 0, err
 	}
-	return deleted, nil
+	deletedAuth, err := auth.RedisClient.Del(uuid).Result()
+	if err != nil {
+		return 0, err
+	}
+	_, err = auth.RedisClient.Del(username + "_access").Result()
+	if err != nil {
+		return 0, err
+	}
+	return deletedAuth, nil
 }
