@@ -23,6 +23,7 @@ func NewOverIssueRouter(router *gin.RouterGroup, iStore *interfaces.InterfaceSto
 
 func (overIssueRouter *OverIssueRouter) ServeRoutes() {
 	overIssueRouter.router.POST("/create/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Create)
+	overIssueRouter.router.POST("/create/multi/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.CreateMultiple)
 	overIssueRouter.router.GET("/:id/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.List)
 	overIssueRouter.router.PATCH("/:id/", overIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), overIssueRouter.interfaceStore.OverIssueInterface.Update)
 }

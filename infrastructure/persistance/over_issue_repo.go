@@ -3,6 +3,7 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"log"
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
@@ -26,12 +27,23 @@ func NewOverIssueRepo(db *gorm.DB, logger hclog.Logger) *OverIssueRepo {
 func (overIssueRepo *OverIssueRepo) Create(overIssue *entity.OverIssue) (*entity.OverIssue, error) {
 	validationErr := overIssue.Validate()
 	if validationErr != nil {
+		log.Println(validationErr)
 		return nil, validationErr
 	}
 
-	creationErr := overIssueRepo.DB.Create(&overIssue).Error
-	if creationErr != nil {
-		return nil, creationErr
+	existingOverIssue := entity.OverIssue{}
+	getErr := overIssueRepo.DB.Preload(clause.Associations).Where("job_item_id = ?", overIssue.JobItemID).Take(&existingOverIssue).Error
+	if getErr != nil {
+		creationErr := overIssueRepo.DB.Create(&overIssue).Error
+		if creationErr != nil {
+			log.Println(creationErr)
+			return nil, creationErr
+		}
+	} else {
+		updationErr := overIssueRepo.DB.Table(entity.OverIssue{}.Tablename()).Where("job_item_id = ?", overIssue.JobItemID).Updates(overIssue).Error
+		if updationErr != nil {
+			return nil, updationErr
+		}
 	}
 
 	return overIssue, nil
@@ -39,7 +51,21 @@ func (overIssueRepo *OverIssueRepo) Create(overIssue *entity.OverIssue) (*entity
 
 func (overIssueRepo *OverIssueRepo) List(jobID string) ([]entity.OverIssue, error) {
 	overIssues := []entity.OverIssue{}
-	getErr := overIssueRepo.DB.Preload(clause.Associations).Where("job_id = ?", jobID).Find(&overIssues).Error
+	rawQuery := "SELECT * FROM over_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE job_id='" + jobID + "')"
+	getErr := overIssueRepo.DB.
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Raw(rawQuery).Find(&overIssues).Error
 	if getErr != nil {
 		return nil, getErr
 	}

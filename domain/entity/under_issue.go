@@ -17,6 +17,8 @@ type UnderIssue struct {
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
 	Required          float32        `json:"required"`
 	Actual            float32        `json:"actual"`
+	Verified          bool           `json:"verified" gorm:"default:false;"`
+	Weighed           bool           `json:"weighed" gorm:"default:false"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`

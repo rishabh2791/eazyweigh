@@ -68,9 +68,58 @@ func (overIssueInterface *OverIssueInterface) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+func (overIssueInterface *OverIssueInterface) CreateMultiple(ctx *gin.Context) {
+	response := value_objects.Response{}
+	createdModels := []interface{}{}
+	creationErrors := []interface{}{}
+
+	requestingUser, ok := ctx.Get("user")
+	if !ok {
+		response.Status = false
+		response.Message = "Anonymous User"
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
+	}
+	user := requestingUser.(*entity.User)
+
+	models := []entity.OverIssue{}
+	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
+	if jsonErr != nil {
+		response.Status = false
+		response.Message = jsonErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	for _, model := range models {
+		model.CreatedByUsername = user.Username
+		model.UpdatedByUsername = user.Username
+
+		_, creationErr := overIssueInterface.appStore.OverIssueApp.Create(&model)
+		if creationErr != nil {
+			creationErrors = append(creationErrors, creationErr)
+		} else {
+			createdModels = append(createdModels, model)
+		}
+	}
+
+	response.Status = true
+	response.Message = "Over Issue Created."
+	response.Payload = map[string]interface{}{
+		"models": createdModels,
+		"errors": creationErrors,
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func (overIssueInterface *OverIssueInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
-	jobID := ctx.Param("job_id")
+	jobID := ctx.Param("id")
 
 	overIssues, getErr := overIssueInterface.appStore.OverIssueApp.List(jobID)
 	if getErr != nil {
