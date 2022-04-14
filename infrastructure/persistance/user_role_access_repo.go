@@ -78,7 +78,7 @@ func (userRoleAccessRepo *UserRoleAccessRepo) Update(userRole string, userRoleAc
 	userRoleAccessRepo.DB.
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Take(&updated)
+		Preload(clause.Associations).Where("user_role_role = ?", userRole).Take(&updated)
 
 	return &updated, nil
 }

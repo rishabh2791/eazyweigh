@@ -496,7 +496,7 @@ func (jobRepo *JobRepo) Update(id string, update *entity.Job) (*entity.Job, erro
 	}
 
 	updated := entity.Job{}
-	jobRepo.DB.Preload(clause.Associations).Take(&updated)
+	jobRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

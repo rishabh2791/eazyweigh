@@ -77,7 +77,7 @@ func (uomRepo *UnitOfMeasureRepo) Update(id string, uom *entity.UnitOfMeasure) (
 	}
 
 	updated := entity.UnitOfMeasure{}
-	uomRepo.DB.Where("id = ?", id).Take(&updated)
+	uomRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

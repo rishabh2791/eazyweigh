@@ -79,7 +79,7 @@ func (bomItemRepo *BOMItemRepo) List(conditions string) ([]entity.BOMItem, error
 func (bomItemRepo *BOMItemRepo) Update(id string, update *entity.BOMItem) (*entity.BOMItem, error) {
 	bomItem := entity.BOMItem{}
 
-	getErr := bomItemRepo.DB.Preload(clause.Associations).Take(&bomItem).Error
+	getErr := bomItemRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&bomItem).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -90,7 +90,7 @@ func (bomItemRepo *BOMItemRepo) Update(id string, update *entity.BOMItem) (*enti
 	}
 
 	updated := entity.BOMItem{}
-	bomItemRepo.DB.Preload(clause.Associations).Take(&updated)
+	bomItemRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

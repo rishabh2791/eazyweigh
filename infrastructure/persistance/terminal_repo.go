@@ -77,13 +77,13 @@ func (terminalRepo *TerminalRepo) Update(id string, update *entity.Terminal) (*e
 		return nil, getErr
 	}
 
-	updationErr := terminalRepo.DB.Table(entity.Terminal{}.Tablename()).Updates(update).Error
+	updationErr := terminalRepo.DB.Table(entity.Terminal{}.Tablename()).Where("id = ?", id).Updates(update).Error
 	if updationErr != nil {
 		return nil, updationErr
 	}
 
 	updated := entity.Terminal{}
-	terminalRepo.DB.Preload(clause.Associations).Take(&updated)
+	terminalRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

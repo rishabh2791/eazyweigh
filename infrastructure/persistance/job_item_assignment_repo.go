@@ -130,7 +130,7 @@ func (jobItemAssignmentRepo *JobItemAssignmentRepo) Update(id string, update *en
 	}
 
 	updated := entity.JobItemAssignment{}
-	jobItemAssignmentRepo.DB.Preload(clause.Associations).Take(&updated)
+	jobItemAssignmentRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

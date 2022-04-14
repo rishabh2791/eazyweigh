@@ -128,7 +128,7 @@ func (bomRepo *BOMRepo) Update(id string, update *entity.BOM) (*entity.BOM, erro
 		return nil, getErr
 	}
 
-	updationErr := bomRepo.DB.Table(entity.BOM{}.Tablename()).Updates(update).Error
+	updationErr := bomRepo.DB.Table(entity.BOM{}.Tablename()).Where("id = ?", id).Updates(update).Error
 	if updationErr != nil {
 		return nil, updationErr
 	}

@@ -86,7 +86,7 @@ func (materialRepo *MaterialRepo) Update(id string, update *entity.Material) (*e
 	}
 
 	updated := entity.Material{}
-	materialRepo.DB.Preload(clause.Associations).Take(&updated)
+	materialRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }
