@@ -23,4 +23,5 @@ func NewJobItemWeightRouter(router *gin.RouterGroup, iStore *interfaces.Interfac
 
 func (jobItemWeightRouter *JobItemWeightRouter) ServeRoutes() {
 	jobItemWeightRouter.router.POST("/create/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.Create)
+	jobItemWeightRouter.router.GET("/list/:job_item_id/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.List)
 }

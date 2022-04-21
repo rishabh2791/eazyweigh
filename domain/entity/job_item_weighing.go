@@ -13,6 +13,7 @@ type JobItemWeighing struct {
 	value_objects.BaseModel
 	ID                string    `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
 	JOBItemID         string    `json:"job_item_id" gorm:"size:191;not null;"`
+	JobItem           *JobItem  `json:"job_item"`
 	Weight            float32   `json:"weight" `
 	Batch             string    `json:"batch" gorm:"size:50;"`
 	StartTime         time.Time `json:"start_time"`

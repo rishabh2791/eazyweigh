@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type JobItemWeighingRepo struct {
@@ -53,4 +54,45 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Create(jobItemWeight *entity.Job
 	}
 
 	return jobItemWeight, nil
+}
+
+func (jobItemWeighingRepo *JobItemWeighingRepo) List(jobItemID string) ([]entity.JobItemWeighing, error) {
+	jobItemWeighings := []entity.JobItemWeighing{}
+
+	getErr := jobItemWeighingRepo.DB.
+		Preload("JobItem.Material.UnitOfMeasure").
+		Preload("JobItem.Material.UnitOfMeasure.Factory").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.UnitOfMeasure.Factory").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.CreatedBy.UserRole").
+		Preload("JobItem.UpdatedBy.UserRole").
+		Preload("JobItem.Material.CreatedBy").
+		Preload("JobItem.Material.CreatedBy.UserRole").
+		Preload("JobItem.Material.UpdatedBy").
+		Preload("JobItem.Material.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("job_item_id = ?", jobItemID).Find(&jobItemWeighings).Error
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	return jobItemWeighings, nil
 }
