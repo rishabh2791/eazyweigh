@@ -28,10 +28,21 @@ func (conversionRepo *UnitOfMeasureConversionRepo) Create(conversion *entity.Uni
 	if validationErr != nil {
 		return nil, validationErr
 	}
-	creationErr := conversionRepo.DB.Create(&conversion).Error
-	if creationErr != nil {
-		return nil, creationErr
+
+	existingConversion := entity.UnitOfMeasureConversion{}
+	getErr := conversionRepo.DB.Preload(clause.Associations).Where("unit_of_measure1_id = ? AND unit_of_measure2_id = ?", conversion.UnitOfMeasure1ID, conversion.UnitOfMeasure2ID).Take(&existingConversion).Error
+	if getErr != nil {
+		creationErr := conversionRepo.DB.Create(&conversion).Error
+		if creationErr != nil {
+			return nil, creationErr
+		}
+	} else {
+		updationErr := conversionRepo.DB.Table(entity.UnitOfMeasureConversion{}.Tablename()).Where("unit_of_measure1_id = ? AND unit_of_measure2_id = ?", conversion.UnitOfMeasure1ID, conversion.UnitOfMeasure2ID).Updates(&conversion).Error
+		if updationErr != nil {
+			return nil, updationErr
+		}
 	}
+
 	return conversion, nil
 }
 

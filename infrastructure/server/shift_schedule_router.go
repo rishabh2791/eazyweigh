@@ -24,7 +24,6 @@ func NewShiftScheduleRouter(router *gin.RouterGroup, iStore *interfaces.Interfac
 func (shiftScheduleRouter *ShiftScheduleRouter) ServeRoutes() {
 	shiftScheduleRouter.router.POST("/create/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.Create)
 	shiftScheduleRouter.router.POST("/create/multi/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.CreateMultiple)
-	shiftScheduleRouter.router.GET("/:id/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.Get)
+	shiftScheduleRouter.router.DELETE("/:id/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.Delete)
 	shiftScheduleRouter.router.POST("/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.List)
-	shiftScheduleRouter.router.PATCH("/:id/", shiftScheduleRouter.middlewares.AuthMiddleware.ValidateAccessToken(), shiftScheduleRouter.interfaceStore.ShiftScheduleInterface.Update)
 }

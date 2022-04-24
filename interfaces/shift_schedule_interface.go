@@ -118,11 +118,11 @@ func (shiftScheduleInterface *ShiftScheduleInterface) CreateMultiple(ctx *gin.Co
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (shiftScheduleInterface *ShiftScheduleInterface) Get(ctx *gin.Context) {
+func (shiftScheduleInterface *ShiftScheduleInterface) Delete(ctx *gin.Context) {
 	response := value_objects.Response{}
 	id := ctx.Param("id")
 
-	shift, getErr := shiftScheduleInterface.appStore.ShiftScheduleApp.Get(id)
+	getErr := shiftScheduleInterface.appStore.ShiftScheduleApp.Delete(id)
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -134,7 +134,7 @@ func (shiftScheduleInterface *ShiftScheduleInterface) Get(ctx *gin.Context) {
 
 	response.Status = true
 	response.Message = "Shift Found"
-	response.Payload = shift
+	response.Payload = ""
 
 	ctx.JSON(http.StatusOK, response)
 }
@@ -166,51 +166,6 @@ func (shiftScheduleInterface *ShiftScheduleInterface) List(ctx *gin.Context) {
 	response.Status = true
 	response.Message = "Shifts Found"
 	response.Payload = shifts
-
-	ctx.JSON(http.StatusOK, response)
-}
-
-func (shiftScheduleInterface *ShiftScheduleInterface) Update(ctx *gin.Context) {
-	response := value_objects.Response{}
-	id := ctx.Param("id")
-
-	requestingUser, ok := ctx.Get("user")
-	if !ok {
-		response.Status = false
-		response.Message = "Anonymous User."
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
-	user := requestingUser.(*entity.User)
-
-	model := entity.ShiftSchedule{}
-	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
-	if jsonErr != nil {
-		response.Status = false
-		response.Message = jsonErr.Error()
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-	model.UpdatedByUsername = user.Username
-
-	updated, updationErr := shiftScheduleInterface.appStore.ShiftScheduleApp.Update(id, &model)
-	if updationErr != nil {
-		response.Status = false
-		response.Message = updationErr.Error()
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-
-	// Return response.
-	response.Status = true
-	response.Message = "Shift Schedule Updated."
-	response.Payload = updated
 
 	ctx.JSON(http.StatusOK, response)
 }

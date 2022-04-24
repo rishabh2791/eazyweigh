@@ -19,23 +19,18 @@ func NewShiftScheduleApp(shiftScheduleRepository repository.ShiftScheduleReposit
 
 type ShiftScheduleAppInterface interface {
 	Create(shiftSchedule *entity.ShiftSchedule) (*entity.ShiftSchedule, error)
-	Get(username string) ([]entity.ShiftSchedule, error)
 	List(conditions string) ([]entity.ShiftSchedule, error)
-	Update(id string, shiftSchedule *entity.ShiftSchedule) (*entity.ShiftSchedule, error)
+	Delete(id string) error
 }
 
 func (shift *ShiftScheduleApp) Create(shiftSchedule *entity.ShiftSchedule) (*entity.ShiftSchedule, error) {
 	return shift.shiftScheduleRepository.Create(shiftSchedule)
 }
 
-func (shift *ShiftScheduleApp) Get(username string) ([]entity.ShiftSchedule, error) {
-	return shift.shiftScheduleRepository.Get(username)
-}
-
 func (shift *ShiftScheduleApp) List(conditions string) ([]entity.ShiftSchedule, error) {
 	return shift.shiftScheduleRepository.List(conditions)
 }
 
-func (shift *ShiftScheduleApp) Update(id string, shiftSchedule *entity.ShiftSchedule) (*entity.ShiftSchedule, error) {
-	return shift.shiftScheduleRepository.Update(id, shiftSchedule)
+func (shift *ShiftScheduleApp) Delete(id string) error {
+	return shift.shiftScheduleRepository.Delete(id)
 }
