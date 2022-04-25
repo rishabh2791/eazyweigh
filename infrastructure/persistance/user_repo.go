@@ -46,7 +46,8 @@ func (userRepo *UserRepo) Get(username string) (*entity.User, error) {
 
 func (userRepo *UserRepo) List(conditions string) ([]entity.User, error) {
 	users := []entity.User{}
-	getErr := userRepo.DB.Preload(clause.Associations).Where(conditions).Find(&users).Error
+	getErr := userRepo.DB.
+		Preload(clause.Associations).Where(conditions).Find(&users).Error
 	if getErr != nil {
 		return nil, getErr
 	}

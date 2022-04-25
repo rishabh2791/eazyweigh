@@ -12,7 +12,8 @@ import (
 type OverIssue struct {
 	value_objects.BaseModel
 	ID                string         `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
-	JobItemID         string         `json:"job_item" gorm:"size:191;not null"`
+	JobItemID         string         `json:"job_item_id" gorm:"size:191;not null"`
+	JobItem           *JobItem       `json:"job_item"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
 	Required          float32        `json:"required"`

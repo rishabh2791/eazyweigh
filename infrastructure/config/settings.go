@@ -1,6 +1,6 @@
 package config
 
-var debug = true
+var debug = false
 
 var defaultsettings = map[string]string{
 	"server_address": "localhost",

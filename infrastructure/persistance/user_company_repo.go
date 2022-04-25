@@ -38,7 +38,13 @@ func (userCompanyRepo *UserCompanyRepo) Create(userCompany *entity.UserCompany) 
 
 func (userCompanyRepo *UserCompanyRepo) Get(conditions string) ([]entity.UserCompany, error) {
 	companyUsers := []entity.UserCompany{}
-	getErr := userCompanyRepo.DB.Preload(clause.Associations).Where(conditions).Find(&companyUsers).Error
+	getErr := userCompanyRepo.DB.
+		Preload("User.UserRole").
+		Preload("Company.CreatedBy").
+		Preload("Company.UpdatedBy").
+		Preload("Company.CreatedBy.UserRole").
+		Preload("Company.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&companyUsers).Error
 	if getErr != nil {
 		return nil, getErr
 	}
