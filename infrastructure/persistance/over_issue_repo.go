@@ -88,6 +88,8 @@ func (overIssueRepo *OverIssueRepo) List(jobID string) ([]entity.OverIssue, erro
 		Preload("JobItem.UnitOfMeasure.Factory.Address").
 		Preload("JobItem.CreatedBy.UserRole").
 		Preload("JobItem.UpdatedBy.UserRole").
+		Preload("JobItem.CreatedBy").
+		Preload("JobItem.UpdatedBy").
 		Preload("JobItem.Material.CreatedBy").
 		Preload("JobItem.Material.CreatedBy.UserRole").
 		Preload("JobItem.Material.UpdatedBy").
