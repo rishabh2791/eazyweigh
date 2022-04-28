@@ -12,7 +12,7 @@ type EQUALS struct {
 }
 
 func (equals EQUALS) BuildConditions() string {
-	return fmt.Sprintf("`%s` = '%s'", equals.Field, equals.Value.(string))
+	return fmt.Sprintf("`%s` = '%s'", strings.ReplaceAll(equals.Field, ".", "`.`"), equals.Value.(string))
 }
 
 type LIKE struct {
@@ -21,7 +21,7 @@ type LIKE struct {
 }
 
 func (like LIKE) BuildConditions() string {
-	return fmt.Sprintf("`%s` LIKE '%%%s%%'", like.Field, like.Value.(string))
+	return fmt.Sprintf("`%s` LIKE '%%%s%%'", strings.ReplaceAll(like.Field, ".", "`.`"), like.Value.(string))
 }
 
 type NOTEQUALS struct {
@@ -30,7 +30,7 @@ type NOTEQUALS struct {
 }
 
 func (notequals NOTEQUALS) BuildConditions() string {
-	return fmt.Sprintf("`%s` <> '%s'", notequals.Field, notequals.Value.(string))
+	return fmt.Sprintf("`%s` <> '%s'", strings.ReplaceAll(notequals.Field, ".", "`.`"), notequals.Value.(string))
 }
 
 type IN struct {
@@ -39,7 +39,7 @@ type IN struct {
 }
 
 func (in IN) BuildConditions() string {
-	return fmt.Sprintf("`%s` IN (%s)", in.Field, in.Value)
+	return fmt.Sprintf("`%s` IN (%s)", strings.ReplaceAll(in.Field, ".", "`.`"), in.Value)
 }
 
 type GREATER struct {
@@ -48,7 +48,7 @@ type GREATER struct {
 }
 
 func (greater GREATER) BuildConditions() string {
-	return fmt.Sprintf("`%s` > '%s'", greater.Field, greater.Value.(string))
+	return fmt.Sprintf("`%s` > '%s'", strings.ReplaceAll(greater.Field, ".", "`.`"), greater.Value.(string))
 }
 
 type LESS struct {
@@ -57,7 +57,7 @@ type LESS struct {
 }
 
 func (less LESS) BuildConditions() string {
-	return fmt.Sprintf("`%s` < '%s'", less.Field, less.Value.(string))
+	return fmt.Sprintf("`%s` < '%s'", strings.ReplaceAll(less.Field, ".", "`.`"), less.Value.(string))
 }
 
 type GREATEREQUAL struct {
@@ -66,7 +66,7 @@ type GREATEREQUAL struct {
 }
 
 func (greater GREATEREQUAL) BuildConditions() string {
-	return fmt.Sprintf("`%s` >= '%s'", greater.Field, greater.Value.(string))
+	return fmt.Sprintf("`%s` >= '%s'", strings.ReplaceAll(greater.Field, ".", "`.`"), greater.Value.(string))
 }
 
 type LESSEQUAL struct {
@@ -75,7 +75,7 @@ type LESSEQUAL struct {
 }
 
 func (less LESSEQUAL) BuildConditions() string {
-	return fmt.Sprintf("`%s` <= '%s'", less.Field, less.Value.(string))
+	return fmt.Sprintf("`%s` <= '%s'", strings.ReplaceAll(less.Field, ".", "`.`"), less.Value.(string))
 }
 
 type BETWEEN struct {
@@ -85,7 +85,7 @@ type BETWEEN struct {
 }
 
 func (between BETWEEN) BuildConditions() string {
-	return fmt.Sprintf("`%s` BETWEEN '%s' AND '%s'", between.Field, between.LowerValue.(string), between.HigherValue.(string))
+	return fmt.Sprintf("`%s` BETWEEN '%s' AND '%s'", strings.ReplaceAll(between.Field, ".", "`.`"), between.LowerValue.(string), between.HigherValue.(string))
 }
 
 type AND struct {
@@ -279,7 +279,7 @@ func ConvertJSONToSQL(body map[string]interface{}) string {
 			sqlQuery += ""
 		}
 	}
-	return strings.ReplaceAll(sqlQuery, ".", "`.`")
+	return sqlQuery
 }
 
 func getCondition(conditionType string, condition interface{}) string {

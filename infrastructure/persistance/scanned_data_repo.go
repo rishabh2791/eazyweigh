@@ -133,7 +133,7 @@ func (scannedDataRepo *ScannedDataRepo) List(conditions string) ([]entity.Scanne
 		Preload("Job.JobItems.JobItemWeighing.CreatedBy.UserRole").
 		Preload("Job.JobItems.JobItemWeighing.UpdatedBy").
 		Preload("Job.JobItems.JobItemWeighing.UpdatedBy.UserRole").
-		Preload(clause.Associations).Find(&scannedData).Error
+		Preload(clause.Associations).Where(conditions).Find(&scannedData).Error
 	if getErr != nil {
 		return nil, getErr
 	}
