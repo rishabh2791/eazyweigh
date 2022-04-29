@@ -190,7 +190,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 		}
 		if currentStockCode[0] == 55 {
 			stockCode = currentStockCode
-			quantity = currentQuantity
+			quantity = job.Quantity
 		}
 	}
 
@@ -214,7 +214,8 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 
 	//Check if BOM Exists, If exists BOM Items are already created. There may be revisions
 	existingBOM := entity.BOM{}
-	getBomErr := jobRepo.DB.Preload("Material.").
+	getBomErr := jobRepo.DB.
+		Preload("Material.").
 		Preload("Material.UnitOfMeasure").
 		Preload("Material.UnitOfMeasure.Factory").
 		Preload("Material.UnitOfMeasure.Factory.Address").

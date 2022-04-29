@@ -3,6 +3,7 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"log"
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
@@ -51,6 +52,7 @@ func (scannedDataRepo *ScannedDataRepo) Get(id string) (*entity.ScannedData, err
 func (scannedDataRepo *ScannedDataRepo) List(conditions string) ([]entity.ScannedData, error) {
 	scannedData := []entity.ScannedData{}
 
+	log.Println(conditions)
 	getErr := scannedDataRepo.DB.
 		Preload("Terminal.UnitOfMeasure.Factory").
 		Preload("Terminal.UnitOfMeasure.Factory.Address").
