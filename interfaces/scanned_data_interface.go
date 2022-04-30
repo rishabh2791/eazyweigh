@@ -6,7 +6,6 @@ import (
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/utilities"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -116,6 +115,5 @@ func (scannedDataInterface *ScannedDataInterface) List(ctx *gin.Context) {
 	response.Message = "Scanned Data Found"
 	response.Payload = scannedData
 
-	log.Println(response)
 	ctx.JSON(http.StatusOK, response)
 }
