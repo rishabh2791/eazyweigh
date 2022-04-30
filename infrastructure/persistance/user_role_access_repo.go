@@ -25,7 +25,7 @@ func NewUserRoleAccessRepo(db *gorm.DB, logger hclog.Logger) *UserRoleAccessRepo
 
 func (userRoleAccessRepo *UserRoleAccessRepo) Create(userRoleAccess *entity.UserRoleAccess) (*entity.UserRoleAccess, error) {
 	existingUserRoleAccess := []entity.UserRoleAccess{}
-	userRoleAccessRepo.DB.Preload(clause.Associations).Where("user_role_role = ? AND table_name = ?", userRoleAccess.UserRoleRole, userRoleAccess.TableName).Take(&existingUserRoleAccess)
+	userRoleAccessRepo.DB.Preload(clause.Associations).Where("user_role_id = ? AND table_name = ?", userRoleAccess.UserRoleID, userRoleAccess.TableName).Take(&existingUserRoleAccess)
 
 	if len(existingUserRoleAccess) == 0 {
 		validationErr := userRoleAccess.Validate()
@@ -38,7 +38,7 @@ func (userRoleAccessRepo *UserRoleAccessRepo) Create(userRoleAccess *entity.User
 			return nil, creationErr
 		}
 	} else {
-		updationErr := userRoleAccessRepo.DB.Table(entity.UserRoleAccess{}.Tablename()).Where("user_role_role = ? AND table_name = ?", userRoleAccess.UserRoleRole, userRoleAccess.TableName).Updates(userRoleAccess).Error
+		updationErr := userRoleAccessRepo.DB.Table(entity.UserRoleAccess{}.Tablename()).Where("user_role_id = ? AND table_name = ?", userRoleAccess.UserRoleID, userRoleAccess.TableName).Updates(userRoleAccess).Error
 		if updationErr != nil {
 			return nil, updationErr
 		}
@@ -47,13 +47,13 @@ func (userRoleAccessRepo *UserRoleAccessRepo) Create(userRoleAccess *entity.User
 	return userRoleAccess, nil
 }
 
-func (userRoleAccessRepo *UserRoleAccessRepo) List(userRole string) ([]entity.UserRoleAccess, error) {
+func (userRoleAccessRepo *UserRoleAccessRepo) List(userRoleID string) ([]entity.UserRoleAccess, error) {
 	userRoleAccesses := []entity.UserRoleAccess{}
 
 	getErr := userRoleAccessRepo.DB.
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("user_role_role = ?", userRole).Find(&userRoleAccesses).Error
+		Preload(clause.Associations).Where("user_role_id = ?", userRoleID).Find(&userRoleAccesses).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -61,15 +61,15 @@ func (userRoleAccessRepo *UserRoleAccessRepo) List(userRole string) ([]entity.Us
 	return userRoleAccesses, nil
 }
 
-func (userRoleAccessRepo *UserRoleAccessRepo) Update(userRole string, userRoleAccess *entity.UserRoleAccess) (*entity.UserRoleAccess, error) {
+func (userRoleAccessRepo *UserRoleAccessRepo) Update(userRoleID string, userRoleAccess *entity.UserRoleAccess) (*entity.UserRoleAccess, error) {
 	existingRoleAccess := entity.UserRoleAccess{}
 
-	getErr := userRoleAccessRepo.DB.Preload(clause.Associations).Where("user_role_role = ?", userRole).Take(&existingRoleAccess).Error
+	getErr := userRoleAccessRepo.DB.Preload(clause.Associations).Where("user_role_id = ?", userRoleID).Take(&existingRoleAccess).Error
 	if getErr != nil {
 		return nil, getErr
 	}
 
-	updationErr := userRoleAccessRepo.DB.Table(entity.UserRoleAccess{}.Tablename()).Where("user_role_role = ?", userRole).Updates(userRoleAccess).Error
+	updationErr := userRoleAccessRepo.DB.Table(entity.UserRoleAccess{}.Tablename()).Where("user_role_id = ?", userRoleID).Updates(userRoleAccess).Error
 	if updationErr != nil {
 		return nil, updationErr
 	}
@@ -78,7 +78,7 @@ func (userRoleAccessRepo *UserRoleAccessRepo) Update(userRole string, userRoleAc
 	userRoleAccessRepo.DB.
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("user_role_role = ?", userRole).Take(&updated)
+		Preload(clause.Associations).Where("user_role_id = ?", userRoleID).Take(&updated)
 
 	return &updated, nil
 }
