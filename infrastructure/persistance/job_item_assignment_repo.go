@@ -28,9 +28,18 @@ func (jobItemAssignmentRepo *JobItemAssignmentRepo) Create(jobItemAssignment *en
 		return nil, validationErr
 	}
 
-	creationErr := jobItemAssignmentRepo.DB.Create(jobItemAssignment).Error
-	if creationErr != nil {
-		return nil, creationErr
+	existingAssignment := entity.JobItemAssignment{}
+	getErr := jobItemAssignmentRepo.DB.Preload(clause.Associations).Where("job_item_id = ?", jobItemAssignment.JobItemID).Take(&existingAssignment).Error
+	if getErr != nil {
+		creationErr := jobItemAssignmentRepo.DB.Create(jobItemAssignment).Error
+		if creationErr != nil {
+			return nil, creationErr
+		}
+	} else {
+		updationErr := jobItemAssignmentRepo.DB.Table(entity.JobItemAssignment{}.Tablename()).Where("job_item_id= ?", jobItemAssignment.JobItemID).Updates(jobItemAssignment).Error
+		if updationErr != nil {
+			return nil, updationErr
+		}
 	}
 
 	updateErr := jobItemAssignmentRepo.DB.Model(&entity.JobItem{}).Where("id = ?", jobItemAssignment.JobItemID).Update("assigned", true).Error
