@@ -3,6 +3,7 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-hclog"
@@ -177,10 +178,12 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 	// Get Material For which Job is Created.
 	query := "SELECT StockCode, TrnQty FROM dbo.InvMovements WHERE Job = '" + getJobCode(job.JobCode) + "'"
 	rows, getErr := jobRepo.WarehouseDB.Raw(query).Rows()
-	defer rows.Close()
+
 	if getErr != nil {
 		return nil, getErr
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		var currentStockCode string
 		var currentQuantity float32
@@ -194,134 +197,139 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 		}
 	}
 
-	// Check if material is created
-	existingStockCode := entity.Material{}
-	getMaterialErr := jobRepo.DB.Where("code = ? AND factory_id = ?", stockCode, job.FactoryID).Take(&existingStockCode).Error
-	if getMaterialErr != nil {
-		//Not Created
-		remoteMaterial, remoteErr := jobRepo.getMaterialFromRemote(stockCode)
-		if remoteErr != nil {
-			return nil, remoteErr
+	if stockCode != "" || len(stockCode) != 0 {
+		// Check if material is created
+		existingStockCode := entity.Material{}
+		getMaterialErr := jobRepo.DB.Where("code = ? AND factory_id = ?", stockCode, job.FactoryID).Take(&existingStockCode).Error
+		if getMaterialErr != nil {
+			//Not Created
+			remoteMaterial, remoteErr := jobRepo.getMaterialFromRemote(stockCode)
+			if remoteErr != nil {
+				return nil, remoteErr
+			}
+
+			//Create Material
+			material, getErr := jobRepo.CreateMaterial(remoteMaterial, job, "Bulk")
+			if getErr != nil {
+				return nil, getErr
+			}
+			existingStockCode = *material
 		}
 
-		//Create Material
-		material, getErr := jobRepo.CreateMaterial(remoteMaterial, job, "Bulk")
-		if getErr != nil {
-			return nil, getErr
-		}
-		existingStockCode = *material
-	}
-
-	//Check if BOM Exists, If exists BOM Items are already created. There may be revisions
-	existingBOM := entity.BOM{}
-	getBomErr := jobRepo.DB.
-		Preload("Material.").
-		Preload("Material.UnitOfMeasure").
-		Preload("Material.UnitOfMeasure.Factory").
-		Preload("Material.UnitOfMeasure.Factory.Address").
-		Preload("Material.UnitOfMeasure.Factory.CreatedBy").
-		Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.CreatedBy").
-		Preload("Material.UnitOfMeasure.UpdatedBy").
-		Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("Material.CreatedBy").
-		Preload("Material.CreatedBy.UserRole").
-		Preload("Material.UpdatedBy").
-		Preload("Material.UpdatedBy.UserRole").
-		Preload("BOMItems.Material.").
-		Preload("BOMItems.Material.UnitOfMeasure").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory.Address").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("BOMItems.Material.UnitOfMeasure.CreatedBy").
-		Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy").
-		Preload("BOMItems.Material.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("BOMItems.Material.CreatedBy").
-		Preload("BOMItems.Material.CreatedBy.UserRole").
-		Preload("BOMItems.Material.UpdatedBy").
-		Preload("BOMItems.Material.UpdatedBy.UserRole").
-		Preload("BOMItems.UnitOfMeasure").
-		Preload("BOMItems.UnitOfMeasure.Factory").
-		Preload("BOMItems.UnitOfMeasure.Factory.Address").
-		Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy").
-		Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("BOMItems.UnitOfMeasure.CreatedBy").
-		Preload("BOMItems.UnitOfMeasure.UpdatedBy").
-		Preload("BOMItems.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("BOMItems.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("BOMItems.CreatedBy").
-		Preload("BOMItems.UpdatedBy").
-		Preload("BOMItems.CreatedBy.UserRole").
-		Preload("BOMItems.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure.Factory").
-		Preload("UnitOfMeasure.Factory.Address").
-		Preload("UnitOfMeasure.Factory.CreatedBy").
-		Preload("UnitOfMeasure.Factory.UpdatedBy").
-		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure.CreatedBy").
-		Preload("UnitOfMeasure.UpdatedBy").
-		Preload("UnitOfMeasure.CreatedBy.UserRole").
-		Preload("UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("factory_id = ? AND material_id = ?", job.FactoryID, existingStockCode.ID).Take(&existingBOM).Error
-	if getBomErr != nil {
-		//Not Created
-		bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 1)
-		if creationErr != nil {
-			return nil, creationErr
-		}
-		existingBOM = *bom
-	} else {
-		//BOM Already Created so check for revision
-		bomRevision, err := jobRepo.checkBOMRevision(stockCode, &existingBOM)
-		if err != nil {
-			return nil, err
-		}
-		if !bomRevision {
-			bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 2)
+		//Check if BOM Exists, If exists BOM Items are already created. There may be revisions
+		existingBOM := entity.BOM{}
+		getBomErr := jobRepo.DB.
+			Preload("Material.").
+			Preload("Material.UnitOfMeasure").
+			Preload("Material.UnitOfMeasure.Factory").
+			Preload("Material.UnitOfMeasure.Factory.Address").
+			Preload("Material.UnitOfMeasure.Factory.CreatedBy").
+			Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
+			Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+			Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+			Preload("Material.UnitOfMeasure.CreatedBy").
+			Preload("Material.UnitOfMeasure.UpdatedBy").
+			Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
+			Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
+			Preload("Material.CreatedBy").
+			Preload("Material.CreatedBy.UserRole").
+			Preload("Material.UpdatedBy").
+			Preload("Material.UpdatedBy.UserRole").
+			Preload("BOMItems.Material.").
+			Preload("BOMItems.Material.UnitOfMeasure").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory.Address").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+			Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+			Preload("BOMItems.Material.UnitOfMeasure.CreatedBy").
+			Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy").
+			Preload("BOMItems.Material.UnitOfMeasure.CreatedBy.UserRole").
+			Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
+			Preload("BOMItems.Material.CreatedBy").
+			Preload("BOMItems.Material.CreatedBy.UserRole").
+			Preload("BOMItems.Material.UpdatedBy").
+			Preload("BOMItems.Material.UpdatedBy.UserRole").
+			Preload("BOMItems.UnitOfMeasure").
+			Preload("BOMItems.UnitOfMeasure.Factory").
+			Preload("BOMItems.UnitOfMeasure.Factory.Address").
+			Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy").
+			Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy").
+			Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
+			Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+			Preload("BOMItems.UnitOfMeasure.CreatedBy").
+			Preload("BOMItems.UnitOfMeasure.UpdatedBy").
+			Preload("BOMItems.UnitOfMeasure.CreatedBy.UserRole").
+			Preload("BOMItems.UnitOfMeasure.UpdatedBy.UserRole").
+			Preload("BOMItems.CreatedBy").
+			Preload("BOMItems.UpdatedBy").
+			Preload("BOMItems.CreatedBy.UserRole").
+			Preload("BOMItems.UpdatedBy.UserRole").
+			Preload("UnitOfMeasure.Factory").
+			Preload("UnitOfMeasure.Factory.Address").
+			Preload("UnitOfMeasure.Factory.CreatedBy").
+			Preload("UnitOfMeasure.Factory.UpdatedBy").
+			Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+			Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+			Preload("UnitOfMeasure.CreatedBy").
+			Preload("UnitOfMeasure.UpdatedBy").
+			Preload("UnitOfMeasure.CreatedBy.UserRole").
+			Preload("UnitOfMeasure.UpdatedBy.UserRole").
+			Preload("CreatedBy.UserRole").
+			Preload("UpdatedBy.UserRole").
+			Preload(clause.Associations).Where("factory_id = ? AND material_id = ?", job.FactoryID, existingStockCode.ID).Take(&existingBOM).Error
+		if getBomErr != nil {
+			//Not Created
+			bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 1)
 			if creationErr != nil {
 				return nil, creationErr
 			}
 			existingBOM = *bom
+		} else {
+			//BOM Already Created so check for revision
+			bomRevision, err := jobRepo.checkBOMRevision(stockCode, &existingBOM)
+			if err != nil {
+				return nil, err
+			}
+			if !bomRevision {
+				bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 2)
+				if creationErr != nil {
+					return nil, creationErr
+				}
+				existingBOM = *bom
+			}
 		}
+
+		job.MaterialID = existingStockCode.ID
+		job.ID = uuid.New().String()
+		jobItems := []entity.JobItem{}
+
+		for _, bomItem := range existingBOM.BOMItems {
+			jobItem := entity.JobItem{}
+			jobItem.JobID = job.ID
+			jobItem.CreatedByUsername = job.CreatedByUsername
+			jobItem.UpdatedByUsername = job.UpdatedByUsername
+			jobItem.MaterialID = bomItem.MaterialID
+			jobItem.RequiredWeight = bomItem.Quantity * quantity
+			jobItem.LowerBound = bomItem.Quantity * quantity * (1.0 - bomItem.LowerTolerance/100)
+			jobItem.UpperBound = bomItem.Quantity * quantity * (1.0 + bomItem.UpperTolerance/100)
+			jobItem.UnitOfMeasureID = bomItem.UnitOfMeasureID
+			jobItems = append(jobItems, jobItem)
+		}
+
+		job.JobItems = jobItems
+
+		creationErr := jobRepo.DB.Create(&job).Error
+		if creationErr != nil {
+			return nil, creationErr
+		}
+
+		return job, nil
+	} else {
+		return nil, errors.New("nothing found in ERP server")
 	}
 
-	job.MaterialID = existingStockCode.ID
-	job.ID = uuid.New().String()
-	jobItems := []entity.JobItem{}
-
-	for _, bomItem := range existingBOM.BOMItems {
-		jobItem := entity.JobItem{}
-		jobItem.JobID = job.ID
-		jobItem.CreatedByUsername = job.CreatedByUsername
-		jobItem.UpdatedByUsername = job.UpdatedByUsername
-		jobItem.MaterialID = bomItem.MaterialID
-		jobItem.RequiredWeight = bomItem.Quantity * quantity
-		jobItem.LowerBound = bomItem.Quantity * quantity * (1.0 - bomItem.LowerTolerance/100)
-		jobItem.UpperBound = bomItem.Quantity * quantity * (1.0 + bomItem.UpperTolerance/100)
-		jobItem.UnitOfMeasureID = bomItem.UnitOfMeasureID
-		jobItems = append(jobItems, jobItem)
-	}
-
-	job.JobItems = jobItems
-
-	creationErr := jobRepo.DB.Create(&job).Error
-	if creationErr != nil {
-		return nil, creationErr
-	}
-
-	return job, nil
 }
 
 func (jobRepo *JobRepo) Get(jobCode string) (*entity.Job, error) {

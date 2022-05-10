@@ -4,7 +4,6 @@ import (
 	"eazyweigh/application"
 	"eazyweigh/domain/value_objects"
 	"eazyweigh/infrastructure/config"
-	"eazyweigh/infrastructure/utilities"
 	"eazyweigh/interfaces"
 	"eazyweigh/interfaces/middlewares"
 	"io"
@@ -26,12 +25,12 @@ type HTTPServer struct {
 func NewHTTPServer(serverConfig config.ServerConfig, appStore *application.AppStore, interfaceStore *interfaces.InterfaceStore, middlewareStore *middlewares.MiddlewareStore) *HTTPServer {
 	httpServer := HTTPServer{}
 
-	if !serverConfig.IsDebug() {
-		gin.SetMode(gin.ReleaseMode)
-		utilities.GinLogger()
-	} else {
-		utilities.NewConsoleLogger()
-	}
+	// if !serverConfig.IsDebug() {
+	// 	gin.SetMode(gin.ReleaseMode)
+	// 	utilities.GinLogger()
+	// } else {
+	// 	utilities.NewConsoleLogger()
+	// }
 
 	httpServer.Router = gin.Default()
 	httpServer.Router.Static("/public", "./public")
