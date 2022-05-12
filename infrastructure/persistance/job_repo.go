@@ -27,14 +27,6 @@ func NewJobRepo(db *gorm.DB, warehouseDB *gorm.DB, logger hclog.Logger) *JobRepo
 	}
 }
 
-func getJobCode(jobCode string) string {
-	code := ""
-	for i := 0; i < 15-len(jobCode); i++ {
-		code += "0"
-	}
-	return code + jobCode
-}
-
 type RemoteMaterial struct {
 	StockCode   string
 	Description string
@@ -175,27 +167,8 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 	var stockCode string
 	var quantity float32
 
-	// Get Material For which Job is Created.
-	query := "SELECT StockCode, TrnQty FROM dbo.InvMovements WHERE Job = '" + getJobCode(job.JobCode) + "'"
-	rows, getErr := jobRepo.WarehouseDB.Raw(query).Rows()
-
-	if getErr != nil {
-		return nil, getErr
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var currentStockCode string
-		var currentQuantity float32
-		scanErr := rows.Scan(&currentStockCode, &currentQuantity)
-		if scanErr != nil {
-			return nil, scanErr
-		}
-		if currentStockCode[0] == 55 {
-			stockCode = currentStockCode
-			quantity = job.Quantity
-		}
-	}
+	stockCode = job.Material.Code
+	quantity = job.Quantity
 
 	if stockCode != "" || len(stockCode) != 0 {
 		// Check if material is created
@@ -301,6 +274,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			}
 		}
 
+		job.Material = nil
 		job.MaterialID = existingStockCode.ID
 		job.ID = uuid.New().String()
 		jobItems := []entity.JobItem{}
@@ -329,7 +303,6 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 	} else {
 		return nil, errors.New("nothing found in ERP server")
 	}
-
 }
 
 func (jobRepo *JobRepo) Get(jobCode string) (*entity.Job, error) {
