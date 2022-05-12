@@ -32,7 +32,9 @@ func (User) Tablename() string {
 
 func (user *User) BeforeCreate(db *gorm.DB) error {
 	user.SecretKey = strings.ReplaceAll(uuid.NewString(), "-", "")
-	user.ProfilePic = "public/profile_pics/default.jpg"
+	if user.ProfilePic == "" || len(user.ProfilePic) == 0 {
+		user.ProfilePic = "public/profile_pics/default.jpg"
+	}
 	hashedPassword, passError := security.Hash(user.Password)
 	if passError != nil {
 		return passError

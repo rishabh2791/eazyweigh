@@ -42,7 +42,7 @@ func NewHTTPServer(serverConfig config.ServerConfig, appStore *application.AppSt
 }
 
 func (httpServer *HTTPServer) Serve() {
-	httpServer.Router.POST("/image/upload/", httpServer.MiddlewareStore.AuthMiddleware.ValidateAccessToken(), ImageUploader)
+	httpServer.Router.POST("/image/upload/", ImageUploader)
 	addressRouter := NewAddressRouter(httpServer.Router.Group("/address/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	authRouter := NewAuthRouter(httpServer.Router.Group("/auth/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	bomRouter := NewBOMRouter(httpServer.Router.Group("/bom/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
