@@ -17,6 +17,7 @@ type Material struct {
 	Description       string         `json:"description" gorm:"size:200;not null;"`
 	UnitOfMeasureID   string         `json:"unit_of_measurement_id" gorm:"size:191;not null;"`
 	UnitOfMeasure     *UnitOfMeasure `json:"unit_of_measurement"`
+	IsWeighed         bool           `json:"is_weighed" gorm:"default:true;"`
 	CreatedByUsername string         `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User          `json:"created_by"`
 	UpdatedByUsername string         `json:"updated_by_username" gorm:"size:20;not null;"`
