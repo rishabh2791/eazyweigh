@@ -59,11 +59,11 @@ func (job *Job) Validate() error {
 	return utilities.ConvertMapToError(errors)
 }
 
-func (job *Job) IsIncomplete() bool {
+func (job *Job) IsComplete() bool {
 	var complete bool
 	complete = true
 	for _, jobItem := range job.JobItems {
-		if jobItem.IsComplete() {
+		if jobItem.IsComplete() && jobItem.Material.IsWeighed {
 			complete = complete && true
 		}
 	}
