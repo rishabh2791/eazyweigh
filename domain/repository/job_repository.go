@@ -7,4 +7,5 @@ type JobRepository interface {
 	Get(jobCode string) (*entity.Job, error)
 	List(conditions string) ([]entity.Job, error)
 	Update(id string, update *entity.Job) (*entity.Job, error)
+	PullFromRemote(factoryID string, username string) error
 }

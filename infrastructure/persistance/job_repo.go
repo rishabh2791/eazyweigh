@@ -4,6 +4,7 @@ import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
 	"errors"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-hclog"
@@ -35,6 +36,12 @@ type RemoteMaterial struct {
 type RemoteBOMItem struct {
 	StockCode string
 	Quantity  float32
+}
+
+type RemoteJob struct {
+	Job       string
+	StockCode string
+	QtyToMake float32
 }
 
 func (jobRepo *JobRepo) getMaterialFromRemote(stockCode string) (*RemoteMaterial, error) {
@@ -71,6 +78,25 @@ func (jobRepo *JobRepo) getBOMFromRemote(stockCode string) ([]RemoteBOMItem, err
 		remoteBOMItems = append(remoteBOMItems, remotBomItem)
 	}
 	return remoteBOMItems, nil
+}
+
+func (jobRepo *JobRepo) GetOpenJobs() ([]RemoteJob, error) {
+	remoteJobs := []RemoteJob{}
+	jobQuery := "SELECT Job, StockCode, QtyToMake FROM dbo.WipMaster WHERE Complete = 'N' AND StockCode LIKE '70%'"
+	rows, getErr := jobRepo.WarehouseDB.Raw(jobQuery).Rows()
+	defer rows.Close()
+	if getErr != nil {
+		return nil, getErr
+	}
+	for rows.Next() {
+		remoteJob := RemoteJob{}
+		scanErr := rows.Scan(&remoteJob.Job, &remoteJob.StockCode, &remoteJob.QtyToMake)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		remoteJobs = append(remoteJobs, remoteJob)
+	}
+	return remoteJobs, nil
 }
 
 func (jobRepo *JobRepo) CreateMaterial(remoteMaterial *RemoteMaterial, job *entity.Job, ty string) (*entity.Material, error) {
@@ -180,6 +206,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			if remoteErr != nil {
 				return nil, remoteErr
 			}
+			// log.Println(remoteMaterial)
 
 			//Create Material
 			material, getErr := jobRepo.CreateMaterial(remoteMaterial, job, "Bulk")
@@ -188,7 +215,6 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			}
 			existingStockCode = *material
 		}
-
 		//Check if BOM Exists, If exists BOM Items are already created. There may be revisions
 		existingBOM := entity.BOM{}
 		getBomErr := jobRepo.DB.
@@ -481,4 +507,39 @@ func (jobRepo *JobRepo) Update(id string, update *entity.Job) (*entity.Job, erro
 	jobRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
+}
+
+func (jobRepo *JobRepo) PullFromRemote(factoryID string, username string) error {
+	remoteJobs, remoteErr := jobRepo.GetOpenJobs()
+	error := ""
+	if remoteErr != nil {
+		return remoteErr
+	}
+	unitOfMeasure := entity.UnitOfMeasure{}
+	getErr := jobRepo.DB.Where("factory_id LIKE ? AND code LIKE ?", factoryID, "KG").Take(&unitOfMeasure).Error
+	if getErr != nil {
+		return getErr
+	}
+	for _, remoteJob := range remoteJobs {
+		job := entity.Job{}
+		job.FactoryID = factoryID
+		job.JobCode = remoteJob.Job[9:len(remoteJob.Job)]
+		job.Material = &entity.Material{}
+		job.Material.FactoryID = factoryID
+		job.Material.Code = remoteJob.StockCode
+		job.Material.UnitOfMeasureID = unitOfMeasure.ID
+		job.Quantity = remoteJob.QtyToMake
+		job.UnitOfMeasureID = unitOfMeasure.ID
+		job.CreatedByUsername = username
+		job.UpdatedByUsername = username
+		_, jobCreationError := jobRepo.Create(&job)
+		if jobCreationError != nil {
+			if strings.Contains(jobCreationError.Error(), "Duplicate") {
+				error += "Job " + job.JobCode + " already created.\n"
+			} else {
+				error += jobCreationError.Error() + "\n"
+			}
+		}
+	}
+	return errors.New(error)
 }
