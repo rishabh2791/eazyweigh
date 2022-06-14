@@ -63,8 +63,10 @@ func (job *Job) IsComplete() bool {
 	var complete bool
 	complete = true
 	for _, jobItem := range job.JobItems {
-		if jobItem.IsComplete() && jobItem.Material.IsWeighed {
-			complete = complete && true
+		if jobItem.Material.IsWeighed {
+			if jobItem.IsComplete() {
+				complete = complete && true
+			}
 		}
 	}
 	return complete
