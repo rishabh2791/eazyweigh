@@ -66,6 +66,8 @@ func (job *Job) IsComplete() bool {
 		if jobItem.Material.IsWeighed {
 			if jobItem.IsComplete() {
 				complete = complete && true
+			} else {
+				complete = complete && false
 			}
 		}
 	}
