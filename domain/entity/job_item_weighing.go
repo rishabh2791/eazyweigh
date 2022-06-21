@@ -30,7 +30,6 @@ func (JobItemWeighing) Tablename() string {
 
 func (jobItemWeighing *JobItemWeighing) BeforeCreate(db *gorm.DB) error {
 	jobItemWeighing.ID = uuid.New().String()
-	jobItemWeighing.EndTime = time.Now()
 	return nil
 }
 
