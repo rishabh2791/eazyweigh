@@ -173,3 +173,31 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) List(jobItemID string) ([]entity
 
 	return jobItemWeighings, nil
 }
+
+func (jobItemWeighingRepo *JobItemWeighingRepo) Update(id string, jobItemWeighing *entity.JobItemWeighing) (*entity.JobItemWeighing, error) {
+	existingJobItemWeighing := entity.JobItemWeighing{}
+	getErr := jobItemWeighingRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingJobItemWeighing).Error
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	updationErr := jobItemWeighingRepo.DB.Table(entity.JobItemWeighing{}.Tablename()).Where("id = ?", id).Updates(jobItemWeighing).Error
+	if updationErr != nil {
+		return nil, updationErr
+	}
+
+	updated := entity.JobItemWeighing{}
+	jobItemWeighingRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
+
+	jobItemID := existingJobItemWeighing.JOBItemID
+	jobItemWeighings := []entity.JobItemWeighing{}
+	weighingsErr := jobItemWeighingRepo.DB.Where("job_item_id = ? AND verified = FALSE", jobItemID).Find(&jobItemWeighings).Error
+	if weighingsErr != nil {
+		return nil, weighingsErr
+	}
+	if len(jobItemWeighings) == 0 {
+		jobItemWeighingRepo.DB.Table(entity.JobItem{}.Tablename()).Where("id = ?", jobItemID).Update("verified", true)
+	}
+
+	return &updated, nil
+}

@@ -16,6 +16,7 @@ type JobItemWeighing struct {
 	JobItem           *JobItem  `json:"job_item"`
 	Weight            float32   `json:"weight" `
 	Batch             string    `json:"batch" gorm:"size:50;"`
+	Verified          bool      `json:"verified" gorm:"default:false;"`
 	StartTime         time.Time `json:"start_time"`
 	EndTime           time.Time `json:"end_time"`
 	CreatedByUsername string    `json:"created_by_username" gorm:"size:20;not null;"`

@@ -20,6 +20,7 @@ func NewJobItemWeighingApp(jobItemWeighingRepository repository.JobItemWeighingR
 type JobItemWeighingAppInterface interface {
 	Create(jobItemWeight *entity.JobItemWeighing) (*entity.JobItemWeighing, error)
 	List(jobItemID string) ([]entity.JobItemWeighing, error)
+	Update(id string, jobItemWeighing *entity.JobItemWeighing) (*entity.JobItemWeighing, error)
 }
 
 func (jobItemWeighingApp *JobItemWeighingApp) Create(jobItemWeight *entity.JobItemWeighing) (*entity.JobItemWeighing, error) {
@@ -28,4 +29,8 @@ func (jobItemWeighingApp *JobItemWeighingApp) Create(jobItemWeight *entity.JobIt
 
 func (jobItemWeighingApp *JobItemWeighingApp) List(jobItemID string) ([]entity.JobItemWeighing, error) {
 	return jobItemWeighingApp.jobItemWeighingRepository.List(jobItemID)
+}
+
+func (jobItemWeighingApp *JobItemWeighingApp) Update(id string, jobItemWeighing *entity.JobItemWeighing) (*entity.JobItemWeighing, error) {
+	return jobItemWeighingApp.jobItemWeighingRepository.Update(id, jobItemWeighing)
 }
