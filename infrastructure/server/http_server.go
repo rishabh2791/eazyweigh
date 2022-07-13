@@ -34,7 +34,7 @@ func NewHTTPServer(serverConfig config.ServerConfig, appStore *application.AppSt
 	}
 
 	httpServer.Router = gin.Default()
-	httpServer.Router.Static("/public", "./public")
+	httpServer.Router.Static("/public", "/home/administrator/Development/code/backend/public")
 	httpServer.InterfaceStore = interfaceStore
 	httpServer.MiddlewareStore = middlewareStore
 	httpServer.AppStore = appStore

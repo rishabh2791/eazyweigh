@@ -152,8 +152,8 @@ func (jobRepo *JobRepo) CreateBOM(job *entity.Job, existingStockCode *entity.Mat
 		bomItem.MaterialID = existingComponent.ID
 		bomItem.Quantity = remoteBOMItem.Quantity
 		bomItem.BOMID = bom.ID
-		bomItem.UpperTolerance = 1
-		bomItem.LowerTolerance = 1
+		bomItem.UpperTolerance = 0.2
+		bomItem.LowerTolerance = 0.2
 		bomItem.UnitOfMeasureID = job.UnitOfMeasureID
 		bomItem.CreatedByUsername = job.CreatedByUsername
 		bomItem.UpdatedByUsername = job.UpdatedByUsername
