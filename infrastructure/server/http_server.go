@@ -110,7 +110,7 @@ func ImageUploader(ctx *gin.Context) {
 	}
 
 	extension := strings.Split(header.Filename, ".")[len(strings.Split(header.Filename, "."))-1]
-	filename := "public/profile_pics/" + uuid.New().String() + "." + extension
+	filename := "/home/administrator/Development/code/backend/public/profile_pics/" + uuid.New().String() + "." + extension
 	out, err := os.Create(filename)
 	if err != nil {
 		response.Status = false

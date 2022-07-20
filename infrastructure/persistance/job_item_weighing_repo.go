@@ -3,6 +3,7 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"math"
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
@@ -44,7 +45,7 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Create(jobItemWeight *entity.Job
 		"actual_weight": jobItem.ActualWeight + jobItemWeight.Weight,
 	}
 
-	if (jobItem.ActualWeight+jobItemWeight.Weight) <= jobItem.UpperBound && (jobItem.ActualWeight+jobItemWeight.Weight) >= jobItem.LowerBound {
+	if math.Round((float64(jobItem.ActualWeight)+float64(jobItemWeight.Weight))*1000)/1000 <= math.Round(float64(jobItem.UpperBound)*1000)/1000 && math.Round((float64(jobItem.ActualWeight)+float64(jobItemWeight.Weight))*1000)/1000 >= math.Round(float64(jobItem.LowerBound)*1000)/1000 {
 		update["complete"] = true
 	}
 
@@ -86,44 +87,8 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Create(jobItemWeight *entity.Job
 		Preload("UnitOfMeasure.CreatedBy.UserRole").
 		Preload("UnitOfMeasure.UpdatedBy").
 		Preload("UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("JobItems.Material").
-		Preload("JobItems.Material.UnitOfMeasure").
-		Preload("JobItems.Material.UnitOfMeasure.Factory").
-		Preload("JobItems.Material.UnitOfMeasure.Factory.Address").
-		Preload("JobItems.Material.UnitOfMeasure.Factory.CreatedBy").
-		Preload("JobItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("JobItems.Material.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("JobItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("JobItems.Material.UnitOfMeasure.CreatedBy").
-		Preload("JobItems.Material.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("JobItems.Material.UnitOfMeasure.UpdatedBy").
-		Preload("JobItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("JobItems.Material.CreatedBy").
-		Preload("JobItems.Material.CreatedBy.UserRole").
-		Preload("JobItems.Material.UpdatedBy").
-		Preload("JobItems.Material.UpdatedBy.UserRole").
-		Preload("JobItems.UnitOfMeasure").
-		Preload("JobItems.UnitOfMeasure.Factory").
-		Preload("JobItems.UnitOfMeasure.Factory.Address").
-		Preload("JobItems.UnitOfMeasure.Factory.CreatedBy").
-		Preload("JobItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("JobItems.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("JobItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("JobItems.UnitOfMeasure.CreatedBy").
-		Preload("JobItems.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("JobItems.UnitOfMeasure.UpdatedBy").
-		Preload("JobItems.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("JobItems.CreatedBy").
-		Preload("JobItems.CreatedBy.UserRole").
-		Preload("JobItems.UpdatedBy").
-		Preload("JobItems.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("JobItems.JobItemWeighing").
-		Preload("JobItems.JobItemWeighing.CreatedBy").
-		Preload("JobItems.JobItemWeighing.CreatedBy.UserRole").
-		Preload("JobItems.JobItemWeighing.UpdatedBy").
-		Preload("JobItems.JobItemWeighing.UpdatedBy.UserRole").
 		Preload(clause.Associations).
 		Where("id = ?", jobItem.JobID).Take(&job)
 	complete := job.IsComplete()
