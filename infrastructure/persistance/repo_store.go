@@ -21,10 +21,13 @@ type RepoStore struct {
 	Logger                      hclog.Logger
 	AddressRepo                 *AddressRepo
 	AuthRepo                    *AuthRepo
+	BatchRepo                   *BatchRepo
 	BOMRepo                     *BOMRepo
 	BOMItemRepo                 *BOMItemRepo
 	CommonRepo                  *CommonRepo
 	CompanyRepo                 *CompanyRepo
+	DeviceRepo                  *DeviceRepo
+	DeviceDataRepo              *DeviceDataRepo
 	FactoryRepo                 *FactoryRepo
 	JobRepo                     *JobRepo
 	JobItemRepo                 *JobItemRepo
@@ -32,9 +35,12 @@ type RepoStore struct {
 	JobItemWeighingRepo         *JobItemWeighingRepo
 	MaterialRepo                *MaterialRepo
 	OverIssueRepo               *OverIssueRepo
+	ProcessRepo                 *ProcessRepo
 	ScannedDataRepo             *ScannedDataRepo
 	ShiftRepo                   *ShiftRepo
 	ShiftScheduleRepo           *ShiftScheduleRepo
+	StepRepo                    *StepRepo
+	StepTypeRepo                *StepTypeRepo
 	TerminalRepo                *TerminalRepo
 	UnderIssueRepo              *UnderIssueRepo
 	UnitOfMeasureRepo           *UnitOfMeasureRepo
@@ -44,6 +50,7 @@ type RepoStore struct {
 	UserRoleAccessRepo          *UserRoleAccessRepo
 	UserCompanyRepo             *UserCompanyRepo
 	UserFactoryRepo             *UserFactoryRepo
+	VesselRepo                  *VesselRepo
 }
 
 func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*RepoStore, error) {
@@ -90,10 +97,13 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.Cache = cacheStore.RedisClient
 	repoStore.AddressRepo = NewAddressRepo(gormDB, logging)
 	repoStore.AuthRepo = NewAuthRepo(logging, serverConfig, cacheStore.RedisClient)
+	repoStore.BatchRepo = NewBatchRepo(gormDB, logging)
 	repoStore.BOMItemRepo = NewBOMItemRepo(gormDB, logging)
 	repoStore.BOMRepo = NewBOMRepo(gormDB, logging, repoStore.BOMItemRepo)
 	repoStore.CompanyRepo = NewCompanyRepo(gormDB, logging)
 	repoStore.CommonRepo = NewCommonRepo(gormDB, logging)
+	repoStore.DeviceRepo = NewDeviceRepo(gormDB, logging)
+	repoStore.DeviceDataRepo = NewDeviceDataRepo(gormDB, logging)
 	repoStore.FactoryRepo = NewFactoryRepo(gormDB, logging)
 	repoStore.JobRepo = NewJobRepo(gormDB, remoteSQLDB, logging)
 	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
@@ -101,9 +111,12 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.JobItemWeighingRepo = NewJobItemWeighingRepo(gormDB, logging)
 	repoStore.MaterialRepo = NewMaterialRepo(gormDB, logging)
 	repoStore.OverIssueRepo = NewOverIssueRepo(gormDB, logging)
+	repoStore.ProcessRepo = NewProcessRepo(gormDB, logging)
 	repoStore.ScannedDataRepo = NewScannedDataRepo(gormDB, logging)
 	repoStore.ShiftRepo = NewShiftRepo(gormDB, logging)
 	repoStore.ShiftScheduleRepo = NewShiftScheduleRepo(gormDB, logging)
+	repoStore.StepRepo = NewStepRepo(gormDB, logging)
+	repoStore.StepTypeRepo = NewStepTypeRepo(gormDB, logging)
 	repoStore.TerminalRepo = NewTerminalRepo(gormDB, logging)
 	repoStore.UnderIssueRepo = NewUnderIssueRepo(gormDB, logging)
 	repoStore.UnitOfMeasureRepo = NewUnitOfMeasureRepo(gormDB, logging)
@@ -113,6 +126,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.UserRoleAccessRepo = NewUserRoleAccessRepo(gormDB, logging)
 	repoStore.UserCompanyRepo = NewUserCompanyRepo(gormDB, logging)
 	repoStore.UserFactoryRepo = NewUserFactoryRepo(gormDB, logging)
+	repoStore.VesselRepo = NewVesselRepo(gormDB, logging)
 
 	return &repoStore, nil
 }
@@ -145,5 +159,12 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.OverIssue{},
 		&entity.UnderIssue{},
 		&entity.ScannedData{},
+		&entity.StepType{},
+		&entity.Process{},
+		&entity.Step{},
+		&entity.Vessel{},
+		&entity.Device{},
+		&entity.DeviceData{},
+		&entity.Batch{},
 	)
 }
