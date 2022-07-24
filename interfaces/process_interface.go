@@ -71,9 +71,9 @@ func (processInterface *ProcessInterface) Create(ctx *gin.Context) {
 
 func (processInterface *ProcessInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
-	id := ctx.Param("id")
+	materialID := ctx.Param("materialID")
 
-	process, getErr := processInterface.appStore.ProcessApp.Get(id)
+	process, getErr := processInterface.appStore.ProcessApp.Get(materialID)
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()

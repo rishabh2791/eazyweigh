@@ -156,5 +156,3 @@ func ImageUploader(ctx *gin.Context) {
 	ctx.AbortWithStatusJSON(http.StatusOK, response)
 	return
 }
-
-func getTables(ctx *gin.Context) {}

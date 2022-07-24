@@ -23,7 +23,7 @@ func NewProcessRouter(router *gin.RouterGroup, interfaceStore *interfaces.Interf
 
 func (router *ProcessRouter) ServeRoutes() {
 	router.router.POST("/create/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.ProcessInterface.Create)
-	router.router.GET("/:id/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.ProcessInterface.Get)
+	router.router.GET("/:materialID/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.ProcessInterface.Get)
 	router.router.POST("/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.ProcessInterface.List)
 	router.router.PATCH("/:id/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.ProcessInterface.Update)
 }
