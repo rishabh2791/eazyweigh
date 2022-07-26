@@ -34,7 +34,11 @@ func NewHTTPServer(serverConfig config.ServerConfig, appStore *application.AppSt
 	}
 
 	httpServer.Router = gin.Default()
-	httpServer.Router.Static("/public", "/home/administrator/Development/code/backend/public")
+	if serverConfig.IsDebug() {
+		httpServer.Router.Static("/public", "./public")
+	} else {
+		httpServer.Router.Static("/public", "/home/administrator/Development/code/backend/public")
+	}
 	httpServer.InterfaceStore = interfaceStore
 	httpServer.MiddlewareStore = middlewareStore
 	httpServer.AppStore = appStore
@@ -45,10 +49,13 @@ func (httpServer *HTTPServer) Serve() {
 	httpServer.Router.POST("/image/upload/", ImageUploader)
 	addressRouter := NewAddressRouter(httpServer.Router.Group("/address/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	authRouter := NewAuthRouter(httpServer.Router.Group("/auth/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	batchRouter := NewBatchRouter(httpServer.Router.Group("/batch/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	bomRouter := NewBOMRouter(httpServer.Router.Group("/bom/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	bomItemRouter := NewBOMItemRouter(httpServer.Router.Group("/bom_item/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	companyRouter := NewCompanyRouter(httpServer.Router.Group("/company/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	commonRouter := NewCommonRouter(httpServer.Router.Group("/common/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	deviceRouter := NewDeviceRouter(httpServer.Router.Group("/device/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	deviceDataRouter := NewDeviceDataRouter(httpServer.Router.Group("/device_data/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	factoryRouter := NewFactoryRouter(httpServer.Router.Group("/factory/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	jobRouter := NewJobRouter(httpServer.Router.Group("/job/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	jobItemRouter := NewJobItemRouter(httpServer.Router.Group("/job_item/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
@@ -56,10 +63,13 @@ func (httpServer *HTTPServer) Serve() {
 	jobItemAssignmentRouter := NewJobItemAssignmentRouter(httpServer.Router.Group("/job_item_assignment/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	materialRouter := NewMaterialRouter(httpServer.Router.Group("/material/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	overIssuerRouter := NewOverIssueRouter(httpServer.Router.Group("/over_issue/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	processRouter := NewProcessRouter(httpServer.Router.Group("/process/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	scannedDataRouter := NewScannedDataRouter(httpServer.Router.Group("/scan/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	shiftRouter := NewShiftRouter(httpServer.Router.Group("/shift/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	shiftScheduleRouter := NewShiftScheduleRouter(httpServer.Router.Group("/shift_schedule/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	underIssueRouter := NewUnderIssueRouter(httpServer.Router.Group("/under_issue/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	stepRouter := NewStepRouter(httpServer.Router.Group("/step/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	stepTypeRouter := NewStepTypeRouter(httpServer.Router.Group("/step_type/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	terminalRouter := NewTerminalRouter(httpServer.Router.Group("/terminal/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	uomRouter := NewUOMRouter(httpServer.Router.Group("/uom/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	uomConversionRouter := NewUOMConversionRouter(httpServer.Router.Group("/uom_conversion/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
@@ -68,13 +78,17 @@ func (httpServer *HTTPServer) Serve() {
 	userRoleAccessRouter := NewUserRoleAccessRouter(httpServer.Router.Group("/user_role_access/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	userCompanyRouter := NewUserCompanyRouter(httpServer.Router.Group("/user_company/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 	userFactoryyRouter := NewUserFactoryRouter(httpServer.Router.Group("/user_factory/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
+	vesselRouter := NewVesselRouter(httpServer.Router.Group("/vessel/"), httpServer.InterfaceStore, httpServer.MiddlewareStore)
 
 	addressRouter.ServeRoutes()
 	authRouter.ServeRoutes()
+	batchRouter.ServeRoutes()
 	bomRouter.ServeRoutes()
 	bomItemRouter.ServeRoutes()
 	companyRouter.ServeRoutes()
 	commonRouter.ServeRoutes()
+	deviceRouter.ServeRoutes()
+	deviceDataRouter.ServeRoutes()
 	factoryRouter.ServeRoutes()
 	jobRouter.ServeRoutes()
 	jobItemRouter.ServeRoutes()
@@ -82,9 +96,12 @@ func (httpServer *HTTPServer) Serve() {
 	jobItemAssignmentRouter.ServeRoutes()
 	materialRouter.ServeRoutes()
 	overIssuerRouter.ServeRoutes()
+	processRouter.ServeRoutes()
 	scannedDataRouter.ServeRoutes()
 	shiftRouter.ServeRoutes()
 	shiftScheduleRouter.ServeRoutes()
+	stepRouter.ServeRoutes()
+	stepTypeRouter.ServeRoutes()
 	terminalRouter.ServeRoutes()
 	underIssueRouter.ServeRoutes()
 	uomRouter.ServeRoutes()
@@ -94,6 +111,7 @@ func (httpServer *HTTPServer) Serve() {
 	userRoleAccessRouter.ServeRoutes()
 	userCompanyRouter.ServeRoutes()
 	userFactoryyRouter.ServeRoutes()
+	vesselRouter.ServeRoutes()
 }
 
 func ImageUploader(ctx *gin.Context) {
@@ -138,5 +156,3 @@ func ImageUploader(ctx *gin.Context) {
 	ctx.AbortWithStatusJSON(http.StatusOK, response)
 	return
 }
-
-func getTables(ctx *gin.Context) {}

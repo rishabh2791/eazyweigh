@@ -54,47 +54,6 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Create(jobItemWeight *entity.Job
 		return nil, updationErr
 	}
 
-	job := entity.Job{}
-
-	jobItemWeighingRepo.DB.
-		Preload("Factory.Address").
-		Preload("Factory.CreatedBy").
-		Preload("Factory.CreatedBy.UserRole").
-		Preload("Factory.UpdatedBy").
-		Preload("Factory.UpdatedBy.UserRole").
-		Preload("Material.UnitOfMeasure").
-		Preload("Material.UnitOfMeasure.Factory").
-		Preload("Material.UnitOfMeasure.Factory.Address").
-		Preload("Material.UnitOfMeasure.Factory.CreatedBy").
-		Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
-		Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.CreatedBy").
-		Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
-		Preload("Material.UnitOfMeasure.UpdatedBy").
-		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("Material.CreatedBy").
-		Preload("Material.CreatedBy.UserRole").
-		Preload("Material.UpdatedBy").
-		Preload("Material.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure.Factory").
-		Preload("UnitOfMeasure.Factory.Address").
-		Preload("UnitOfMeasure.Factory.CreatedBy").
-		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
-		Preload("UnitOfMeasure.Factory.UpdatedBy").
-		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure.CreatedBy").
-		Preload("UnitOfMeasure.CreatedBy.UserRole").
-		Preload("UnitOfMeasure.UpdatedBy").
-		Preload("UnitOfMeasure.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).
-		Where("id = ?", jobItem.JobID).Take(&job)
-	complete := job.IsComplete()
-
-	jobItemWeighingRepo.DB.Table(entity.Job{}.Tablename()).Where("id = ?", jobItem.JobID).Update("complete = ?", complete)
-
 	return jobItemWeight, nil
 }
 

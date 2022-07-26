@@ -5,10 +5,13 @@ import "eazyweigh/infrastructure/persistance"
 type AppStore struct {
 	AddressApp                 *AddressApp
 	AuthApp                    *AuthApp
+	BatchApp                   *BatchApp
 	BOMApp                     *BOMApp
 	BOMItemApp                 *BOMItemApp
 	CompanyApp                 *CompanyApp
 	CommonApp                  *CommonApp
+	DeviceApp                  *DeviceApp
+	DeviceDataApp              *DeviceDataApp
 	FactoryApp                 *FactoryApp
 	JobApp                     *JobApp
 	JobItemApp                 *JobItemApp
@@ -16,9 +19,12 @@ type AppStore struct {
 	JobItemWeighingApp         *JobItemWeighingApp
 	MaterialApp                *MaterialApp
 	OverIssueApp               *OverIssueApp
+	ProcessApp                 *ProcessApp
 	ScannedDataApp             *ScannedDataApp
 	ShiftApp                   *ShiftApp
 	ShiftScheduleApp           *ShiftScheduleApp
+	StepApp                    *StepApp
+	StepTypeApp                *StepTypeApp
 	UnitOfMeasureApp           *UnitOfMeasureApp
 	TerminalApp                *TerminalApp
 	UnderIssueApp              *UnderIssueApp
@@ -28,16 +34,20 @@ type AppStore struct {
 	UserRoleAccessApp          *UserRoleAccessApp
 	UserCompanyApp             *UserCompanyApp
 	UserFactoryApp             *UserFactoryApp
+	VesselApp                  *VesselApp
 }
 
 func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore := AppStore{}
 	appStore.AddressApp = NewAddressApp(repoStore.AddressRepo)
 	appStore.AuthApp = NewAuthApp(repoStore.AuthRepo)
+	appStore.BatchApp = NewBatchApp(repoStore.BatchRepo)
 	appStore.BOMApp = NewBOMApp(repoStore.BOMRepo)
 	appStore.BOMItemApp = NewBOMItemApp(repoStore.BOMItemRepo)
 	appStore.CompanyApp = NewCompanyApp(repoStore.CompanyRepo)
 	appStore.CommonApp = NewCommonApp(repoStore.CommonRepo)
+	appStore.DeviceApp = NewDeviceApp(repoStore.DeviceRepo)
+	appStore.DeviceDataApp = NewDeviceDataApp(repoStore.DeviceDataRepo)
 	appStore.FactoryApp = NewFactoryRepository(repoStore.FactoryRepo)
 	appStore.JobApp = NewJobApp(repoStore.JobRepo)
 	appStore.JobItemApp = NewJobItemApp(repoStore.JobItemRepo)
@@ -45,9 +55,12 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.JobItemWeighingApp = NewJobItemWeighingApp(repoStore.JobItemWeighingRepo)
 	appStore.MaterialApp = NewMaterialApp(repoStore.MaterialRepo)
 	appStore.OverIssueApp = NewOverIssueApp(repoStore.OverIssueRepo)
+	appStore.ProcessApp = NewProcessApp(repoStore.ProcessRepo)
 	appStore.ScannedDataApp = NewScannedDataApp(repoStore.ScannedDataRepo)
 	appStore.ShiftApp = NewShiftApp(repoStore.ShiftRepo)
 	appStore.ShiftScheduleApp = NewShiftScheduleApp(repoStore.ShiftScheduleRepo)
+	appStore.StepApp = NewStepApp(repoStore.StepRepo)
+	appStore.StepTypeApp = NewStepTypeApp(repoStore.StepTypeRepo)
 	appStore.TerminalApp = NewTerminalApp(repoStore.TerminalRepo)
 	appStore.UnderIssueApp = NewUnderIssueApp(repoStore.UnderIssueRepo)
 	appStore.UnitOfMeasureApp = NewUnitOfMeasureApp(repoStore.UnitOfMeasureRepo)
@@ -57,5 +70,6 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.UserRoleAccessApp = NewUserRoleAccessApp(repoStore.UserRoleAccessRepo)
 	appStore.UserCompanyApp = NewUserCompanyApp(repoStore.UserCompanyRepo)
 	appStore.UserFactoryApp = NewUserFactoryApp(repoStore.UserFactoryRepo)
+	appStore.VesselApp = NewVesselApp(repoStore.VesselRepo)
 	return &appStore
 }

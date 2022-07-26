@@ -40,7 +40,14 @@ func (shiftRepo *ShiftRepo) Create(shift *entity.Shift) (*entity.Shift, error) {
 func (shiftRepo *ShiftRepo) Get(id string) (*entity.Shift, error) {
 	shift := entity.Shift{}
 
-	getErr := shiftRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&shift).Error
+	getErr := shiftRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").Preload(clause.Associations).Where("id = ?", id).Take(&shift).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -57,9 +64,7 @@ func (shiftRepo *ShiftRepo) List(conditions string) ([]entity.Shift, error) {
 		Preload("Factory.CreatedBy.UserRole").
 		Preload("Factory.UpdatedBy").
 		Preload("Factory.UpdatedBy.UserRole").
-		Preload("CreatedBy").
 		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy").
 		Preload("UpdatedBy.UserRole").
 		Preload(clause.Associations).Where(conditions).Find(&shifts).Error
 	if getErr != nil {
