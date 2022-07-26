@@ -167,9 +167,9 @@ func (jobRepo *JobRepo) CreateBOM(job *entity.Job, existingStockCode *entity.Mat
 	return &bom, nil
 }
 
-func checkInRemoteBOMItems(stockCode string, bomItems []RemoteBOMItem) bool {
+func checkInRemoteBOMItems(bomItem *entity.BOMItem, bomItems []RemoteBOMItem) bool {
 	for _, remoteBOMItem := range bomItems {
-		if stockCode == remoteBOMItem.StockCode {
+		if bomItem.Material.Code == remoteBOMItem.StockCode && bomItem.Quantity == remoteBOMItem.Quantity {
 			return true
 		}
 	}
@@ -183,7 +183,7 @@ func (jobRepo *JobRepo) checkBOMRevision(stockCode string, bom *entity.BOM) (boo
 		return true, remoteErr
 	}
 	for _, bomItem := range bom.BOMItems {
-		check := checkInRemoteBOMItems(bomItem.Material.Code, remoteBOMItems)
+		check := checkInRemoteBOMItems(&bomItem, remoteBOMItems)
 		revision = revision && check
 	}
 	return revision, nil
@@ -447,15 +447,15 @@ func (jobRepo *JobRepo) List(conditions string) ([]entity.Job, error) {
 		Preload("UnitOfMeasure.UpdatedBy").
 		Preload("UnitOfMeasure.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").		
+		Preload("UpdatedBy.UserRole").
 		Preload(clause.Associations).Where(conditions).Find(&jobs).Error
 	if getErr != nil {
 		return nil, getErr
 	}
-	for _, job := range jobs{
+	for _, job := range jobs {
 		jobID := job.ID
 		thisJob := entity.Job{}
-		thisJob=job
+		thisJob = job
 		jobItems := []entity.JobItem{}
 		jobRepo.DB.
 			Preload("Material.UnitOfMeasure").
@@ -521,7 +521,7 @@ func (jobRepo *JobRepo) List(conditions string) ([]entity.Job, error) {
 			Preload("JobItemWeighing.UpdatedBy.UserRole").
 			Preload(clause.Associations).Where("job_id = ?", jobID).Find(&jobItems)
 		thisJob.JobItems = jobItems
-		allJobs = append(allJobs, thisJob)		
+		allJobs = append(allJobs, thisJob)
 	}
 	return allJobs, nil
 }
