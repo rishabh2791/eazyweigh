@@ -11,9 +11,9 @@ import (
 type Device struct {
 	value_objects.BaseModel
 	ID                string       `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
-	VesselID          string       `json:"vessel_id" gorm:"size:191;not null;"`
+	VesselID          string       `json:"vessel_id" gorm:"size:191;not null;uniqueIndex:vessel_name;"`
 	Vessel            *Vessel      `json:"vessel"`
-	Name              string       `json:"name" gorm:"size:200;not null;unique;"`
+	Name              string       `json:"name" gorm:"size:200;not null;uniqueIndex:vessel_name;"`
 	CreatedByUsername string       `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User        `json:"created_by"`
 	UpdatedByUsername string       `json:"updated_by_username" gorm:"size:20;not null;"`

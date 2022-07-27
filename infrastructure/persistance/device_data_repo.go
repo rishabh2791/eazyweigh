@@ -39,6 +39,6 @@ func (deviceDataRepo *DeviceDataRepo) GetForDevice(deviceID string, conditions s
 	getErr := deviceDataRepo.DB.
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("device_id = ?", deviceID).Where(conditions).Find(deviceData).Error
+		Preload(clause.Associations).Where("device_id = ?", deviceID).Where(conditions).Find(&deviceData).Error
 	return deviceData, getErr
 }

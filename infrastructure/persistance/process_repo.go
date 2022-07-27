@@ -103,7 +103,7 @@ func (processRepo *ProcessRepo) List(conditions string) ([]entity.Process, error
 		Preload("Step.UpdatedBy").
 		Preload("Step.CreatedBy.UserRole").
 		Preload("Step.UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(processes).Error
+		Preload(clause.Associations).Where(conditions).Find(&processes).Error
 	return processes, getErr
 }
 
