@@ -269,7 +269,7 @@ func (batchRepo *BatchRepo) List(conditions string) ([]entity.Batch, error) {
 		Preload("Process.Step.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(batches).Error
+		Preload(clause.Associations).Where(conditions).Find(&batches).Error
 	return batches, getErr
 }
 

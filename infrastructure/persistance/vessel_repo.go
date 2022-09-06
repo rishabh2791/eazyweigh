@@ -59,7 +59,7 @@ func (vesselRepo *VesselRepo) List(conditions string) ([]entity.Vessel, error) {
 		Preload("Factory.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(vessels).Error
+		Preload(clause.Associations).Where(conditions).Find(&vessels).Error
 	return vessels, getErr
 }
 

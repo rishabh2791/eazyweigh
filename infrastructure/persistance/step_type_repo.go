@@ -61,7 +61,7 @@ func (stepTypeRepo *StepTypeRepo) List(conditions string) ([]entity.StepType, er
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(stepTypes).Error
+		Preload(clause.Associations).Where(conditions).Find(&stepTypes).Error
 	return stepTypes, getErr
 }
 

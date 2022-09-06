@@ -11,9 +11,9 @@ import (
 type StepType struct {
 	value_objects.BaseModel
 	ID                string   `json:"id" gorm:"size:191;not null;primaryKey;unique;"`
-	FactoryID         string   `json:"factory_id" gorm:"size:191;not null;"`
+	FactoryID         string   `json:"factory_id" gorm:"size:191;not null;uniqueIndex:factory_name;"`
 	Factory           *Factory `json:"factory"`
-	Name              string   `json:"description" gorm:"size:1000;"`
+	Name              string   `json:"description" gorm:"size:300;uniqueIndex:factory_name;"`
 	CreatedByUsername string   `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User    `json:"created_by"`
 	UpdatedByUsername string   `json:"updated_by_username" gorm:"size:20;not null;"`

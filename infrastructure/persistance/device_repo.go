@@ -75,7 +75,7 @@ func (deviceRepo *DeviceRepo) List(conditions string) ([]entity.Device, error) {
 		Preload("DeviceData.UpdatedBy").
 		Preload("DeviceData.CreatedBy.UserRole").
 		Preload("DeviceData.UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(devices).Error
+		Preload(clause.Associations).Where(conditions).Find(&devices).Error
 	return devices, getErr
 }
 
