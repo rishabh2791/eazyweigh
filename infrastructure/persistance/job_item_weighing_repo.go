@@ -42,7 +42,8 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Create(jobItemWeight *entity.Job
 	}
 
 	update := map[string]interface{}{
-		"actual_weight": jobItem.ActualWeight + jobItemWeight.Weight,
+		"actual_weight":       jobItem.ActualWeight + jobItemWeight.Weight,
+		"updated_by_username": jobItemWeight.UpdatedByUsername,
 	}
 
 	if math.Round((float64(jobItem.ActualWeight)+float64(jobItemWeight.Weight))*1000)/1000 <= math.Round(float64(jobItem.UpperBound)*1000)/1000 && math.Round((float64(jobItem.ActualWeight)+float64(jobItemWeight.Weight))*1000)/1000 >= math.Round(float64(jobItem.LowerBound)*1000)/1000 {

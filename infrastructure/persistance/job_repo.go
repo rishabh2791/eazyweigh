@@ -189,6 +189,24 @@ func (jobRepo *JobRepo) checkBOMRevision(stockCode string, bom *entity.BOM) (boo
 	return revision, nil
 }
 
+func (jobRepo *JobRepo) GetExistingBOM(stockCode string, boms []entity.BOM) *entity.BOM {
+	remoteBOMItems, remoteErr := jobRepo.getBOMFromRemote(stockCode)
+	if remoteErr != nil {
+		return nil
+	}
+	for _, bom := range boms {
+		checkThisBOM := true
+		for _, bomItem := range bom.BOMItems {
+			check := checkInRemoteBOMItems(&bomItem, remoteBOMItems)
+			checkThisBOM = checkThisBOM && check
+		}
+		if checkThisBOM {
+			return &bom
+		}
+	}
+	return nil
+}
+
 func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 	var stockCode string
 	var quantity float32
@@ -216,6 +234,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			existingStockCode = *material
 		}
 		//Check if BOM Exists, If exists BOM Items are already created. There may be revisions
+		existingBOMs := []entity.BOM{}
 		existingBOM := entity.BOM{}
 		getBomErr := jobRepo.DB.
 			Preload("Material.").
@@ -277,7 +296,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			Preload("UnitOfMeasure.UpdatedBy.UserRole").
 			Preload("CreatedBy.UserRole").
 			Preload("UpdatedBy.UserRole").
-			Preload(clause.Associations).Where("factory_id = ? AND material_id = ?", job.FactoryID, existingStockCode.ID).Take(&existingBOM).Error
+			Preload(clause.Associations).Where("factory_id = ? AND material_id = ?", job.FactoryID, existingStockCode.ID).Find(&existingBOMs).Error
 		if getBomErr != nil {
 			//Not Created
 			bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 1)
@@ -287,16 +306,15 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 			existingBOM = *bom
 		} else {
 			//BOM Already Created so check for revision
-			bomRevision, err := jobRepo.checkBOMRevision(stockCode, &existingBOM)
-			if err != nil {
-				return nil, err
-			}
-			if !bomRevision {
-				bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, 2)
+			existing := jobRepo.GetExistingBOM(stockCode, existingBOMs)
+			if existing == nil {
+				bom, creationErr := jobRepo.CreateBOM(job, &existingStockCode, stockCode, len(existingBOMs)+1)
 				if creationErr != nil {
 					return nil, creationErr
 				}
 				existingBOM = *bom
+			} else {
+				existingBOM = *existing
 			}
 		}
 
