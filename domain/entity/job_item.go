@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-//sa123
 type JobItem struct {
 	value_objects.BaseModel
 	ID                string            `json:"id" gorm:"size:191;not null;unique;primaryKey;"`

@@ -26,6 +26,6 @@ func (jobRouter *JobRouter) ServeRoutes() {
 	jobRouter.router.POST("/create/multi/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.CreateMultiple)
 	jobRouter.router.GET("/:id/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.Get)
 	jobRouter.router.POST("/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.List)
-	jobRouter.router.PATCH("/:id/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.Update)
+	jobRouter.router.PATCH("/:jobCode/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.Update)
 	jobRouter.router.GET("/remote/:factory_id/", jobRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobRouter.interfaceStore.JobInterface.PullFromRemote)
 }

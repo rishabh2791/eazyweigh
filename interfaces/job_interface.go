@@ -172,7 +172,7 @@ func (jobInterface *JobInterface) List(ctx *gin.Context) {
 
 func (jobInterface *JobInterface) Update(ctx *gin.Context) {
 	response := value_objects.Response{}
-	id := ctx.Param("id")
+	jobCode := ctx.Param("jobCode")
 
 	requestingUser, ok := ctx.Get("user")
 	if !ok {
@@ -197,7 +197,7 @@ func (jobInterface *JobInterface) Update(ctx *gin.Context) {
 	}
 	model.UpdatedByUsername = user.Username
 
-	updated, updationErr := jobInterface.appStore.JobApp.Update(id, &model)
+	updated, updationErr := jobInterface.appStore.JobApp.Update(jobCode, &model)
 	if updationErr != nil {
 		response.Status = false
 		response.Message = updationErr.Error()

@@ -345,7 +345,7 @@ func (jobRepo *JobRepo) Create(job *entity.Job) (*entity.Job, error) {
 
 		return job, nil
 	} else {
-		return nil, errors.New("nothing found in ERP server")
+		return nil, errors.New("nothing found in ERP server\n")
 	}
 }
 
@@ -544,20 +544,226 @@ func (jobRepo *JobRepo) List(conditions string) ([]entity.Job, error) {
 	return allJobs, nil
 }
 
-func (jobRepo *JobRepo) Update(id string, update *entity.Job) (*entity.Job, error) {
+func (jobRepo *JobRepo) Update(jobCode string, update *entity.Job) (*entity.Job, error) {
+	// Check Existing Job
 	existingJob := entity.Job{}
-	getErr := jobRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingJob).Error
+	getErr := jobRepo.DB.Preload(clause.Associations).Where("job_code = ?", jobCode).Take(&existingJob).Error
 	if getErr != nil {
 		return nil, getErr
 	}
 
-	updationErr := jobRepo.DB.Table(entity.Job{}.Tablename()).Where("id = ?", id).Updates(update).Error
+	// //If Job Exists, check for BOM if it has changed or it's still the same
+	// existingBOMs := []entity.BOM{}
+	// existingBOM := entity.BOM{}
+	// jobRepo.DB.
+	// 	Preload("Material.").
+	// 	Preload("Material.UnitOfMeasure").
+	// 	Preload("Material.UnitOfMeasure.Factory").
+	// 	Preload("Material.UnitOfMeasure.Factory.Address").
+	// 	Preload("Material.UnitOfMeasure.Factory.CreatedBy").
+	// 	Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
+	// 	Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+	// 	Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+	// 	Preload("Material.UnitOfMeasure.CreatedBy").
+	// 	Preload("Material.UnitOfMeasure.UpdatedBy").
+	// 	Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
+	// 	Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
+	// 	Preload("Material.CreatedBy").
+	// 	Preload("Material.CreatedBy.UserRole").
+	// 	Preload("Material.UpdatedBy").
+	// 	Preload("Material.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.Material.").
+	// 	Preload("BOMItems.Material.UnitOfMeasure").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory.Address").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.CreatedBy").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.CreatedBy.UserRole").
+	// 	Preload("BOMItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.Material.CreatedBy").
+	// 	Preload("BOMItems.Material.CreatedBy.UserRole").
+	// 	Preload("BOMItems.Material.UpdatedBy").
+	// 	Preload("BOMItems.Material.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.UnitOfMeasure").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory.Address").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
+	// 	Preload("BOMItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.UnitOfMeasure.CreatedBy").
+	// 	Preload("BOMItems.UnitOfMeasure.UpdatedBy").
+	// 	Preload("BOMItems.UnitOfMeasure.CreatedBy.UserRole").
+	// 	Preload("BOMItems.UnitOfMeasure.UpdatedBy.UserRole").
+	// 	Preload("BOMItems.CreatedBy").
+	// 	Preload("BOMItems.UpdatedBy").
+	// 	Preload("BOMItems.CreatedBy.UserRole").
+	// 	Preload("BOMItems.UpdatedBy.UserRole").
+	// 	Preload("UnitOfMeasure.Factory").
+	// 	Preload("UnitOfMeasure.Factory.Address").
+	// 	Preload("UnitOfMeasure.Factory.CreatedBy").
+	// 	Preload("UnitOfMeasure.Factory.UpdatedBy").
+	// 	Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+	// 	Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+	// 	Preload("UnitOfMeasure.CreatedBy").
+	// 	Preload("UnitOfMeasure.UpdatedBy").
+	// 	Preload("UnitOfMeasure.CreatedBy.UserRole").
+	// 	Preload("UnitOfMeasure.UpdatedBy.UserRole").
+	// 	Preload("CreatedBy.UserRole").
+	// 	Preload("UpdatedBy.UserRole").
+	// 	Preload(clause.Associations).
+	// 	Where("factory_id = ? AND material_id = ?", existingJob.FactoryID, existingJob.MaterialID).Find(&existingBOMs)
+
+	// existing := jobRepo.GetExistingBOM(existingJob.MaterialID, existingBOMs)
+	// if existing == nil {
+	// 	bom, creationErr := jobRepo.CreateBOM(&existingJob, existingJob.Material, existingJob.Material.Code, len(existingBOMs)+1)
+	// 	if creationErr != nil {
+	// 		return nil, creationErr
+	// 	}
+	// 	existingBOM = *bom
+	// } else {
+	// 	existingBOM = *existing
+	// }
+
+	// // Get Job Items for the existing Job
+	// existingJobItems := []entity.JobItem{}
+	// jobItemsError := jobRepo.DB.Preload(clause.Associations).Where("job_id=?", existingJob.ID).Find(&existingJobItems).Error
+	// if jobItemsError != nil {
+	// 	return nil, jobItemsError
+	// }
+
+	// // Delete all Existing Job Items
+	// for _, jobItem := range existingJobItems {
+	// 	jobRepo.DB.Where("id = ?", jobItem.ID).Delete(&entity.JobItem{})
+	// }
+
+	// // Create New Job Items
+	// update.JobItems = []entity.JobItem{}
+	// for _, bomItem := range existingBOM.BOMItems {
+	// 	jobItem := entity.JobItem{}
+	// 	jobItem.JobID = existingJob.ID
+	// 	jobItem.CreatedByUsername = existingJob.UpdatedByUsername
+	// 	jobItem.UpdatedByUsername = existingJob.UpdatedByUsername
+	// 	jobItem.MaterialID = bomItem.MaterialID
+	// 	jobItem.RequiredWeight = bomItem.Quantity * update.Quantity
+	// 	jobItem.LowerBound = bomItem.Quantity * update.Quantity * (1.0 - bomItem.LowerTolerance/100)
+	// 	jobItem.UpperBound = bomItem.Quantity * update.Quantity * (1.0 + bomItem.UpperTolerance/100)
+	// 	jobItem.UnitOfMeasureID = bomItem.UnitOfMeasureID
+	// 	update.JobItems = append(update.JobItems, jobItem)
+	// }
+
+	if existingJob.Complete {
+		return nil, errors.New("Job " + jobCode + " Complete and can not be updated.\n")
+	}
+
+	factor := update.Quantity / existingJob.Quantity
+
+	// Get Job Items for the existing Job
+	existingJobItems := []entity.JobItem{}
+	weighedJobItems := []entity.JobItem{}
+	jobItemsError := jobRepo.DB.Preload(clause.Associations).Where("job_id=?", existingJob.ID).Find(&existingJobItems).Error
+	if jobItemsError != nil {
+		return nil, jobItemsError
+	}
+	completedJobItemsError := jobRepo.DB.Preload(clause.Associations).Where("job_id=? AND actual_weight != 0", existingJob.ID).Find(&weighedJobItems).Error
+	if completedJobItemsError != nil {
+		return nil, completedJobItemsError
+	}
+
+	if len(weighedJobItems) != 0 {
+		return nil, errors.New("At least one Job Item Weighed Out, can not update Job " + jobCode + ".\n")
+	}
+
+	for _, jobItem := range existingJobItems {
+		jobItemUpdate := entity.JobItem{}
+		jobItemUpdate.RequiredWeight = jobItem.RequiredWeight * factor
+		jobItemUpdate.UpperBound = jobItem.UpperBound * factor
+		jobItemUpdate.LowerBound = jobItem.LowerBound * factor
+		jobItemUpdate.UpdatedByUsername = update.UpdatedByUsername
+		jobRepo.DB.Table(entity.JobItem{}.Tablename()).Where("id = ?", jobItem.ID).Updates(jobItemUpdate)
+	}
+
+	// Update Job Details
+	updationErr := jobRepo.DB.Table(entity.Job{}.Tablename()).Where("job_code = ?", jobCode).Updates(update).Error
 	if updationErr != nil {
 		return nil, updationErr
 	}
 
 	updated := entity.Job{}
-	jobRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
+	jobRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("Material.UnitOfMeasure").
+		Preload("Material.UnitOfMeasure.Factory").
+		Preload("Material.UnitOfMeasure.Factory.Address").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.CreatedBy").
+		Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.UpdatedBy").
+		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("Material.CreatedBy").
+		Preload("Material.CreatedBy.UserRole").
+		Preload("Material.UpdatedBy").
+		Preload("Material.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItems.Material").
+		Preload("JobItems.Material.UnitOfMeasure").
+		Preload("JobItems.Material.UnitOfMeasure.Factory").
+		Preload("JobItems.Material.UnitOfMeasure.Factory.Address").
+		Preload("JobItems.Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItems.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItems.Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItems.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItems.Material.UnitOfMeasure.CreatedBy").
+		Preload("JobItems.Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItems.Material.UnitOfMeasure.UpdatedBy").
+		Preload("JobItems.Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItems.Material.CreatedBy").
+		Preload("JobItems.Material.CreatedBy.UserRole").
+		Preload("JobItems.Material.UpdatedBy").
+		Preload("JobItems.Material.UpdatedBy.UserRole").
+		Preload("JobItems.UnitOfMeasure").
+		Preload("JobItems.UnitOfMeasure.Factory").
+		Preload("JobItems.UnitOfMeasure.Factory.Address").
+		Preload("JobItems.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItems.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItems.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItems.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItems.UnitOfMeasure.CreatedBy").
+		Preload("JobItems.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItems.UnitOfMeasure.UpdatedBy").
+		Preload("JobItems.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItems.CreatedBy").
+		Preload("JobItems.CreatedBy.UserRole").
+		Preload("JobItems.UpdatedBy").
+		Preload("JobItems.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("JobItems.JobItemWeighing").
+		Preload("JobItems.JobItemWeighing.CreatedBy").
+		Preload("JobItems.JobItemWeighing.CreatedBy.UserRole").
+		Preload("JobItems.JobItemWeighing.UpdatedBy").
+		Preload("JobItems.JobItemWeighing.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("job_code = ?", jobCode).Take(&updated)
 
 	return &updated, nil
 }
@@ -588,7 +794,18 @@ func (jobRepo *JobRepo) PullFromRemote(factoryID string, username string) error 
 		_, jobCreationError := jobRepo.Create(&job)
 		if jobCreationError != nil {
 			if strings.Contains(jobCreationError.Error(), "Duplicate") {
-				error += "Job " + job.JobCode + " already created.\n"
+				existingJob := entity.Job{}
+				jobRepo.DB.Where("job_code = ?", job.JobCode).Take(&existingJob)
+				if job.Quantity != existingJob.Quantity {
+					updatedJob := entity.Job{}
+					updatedJob.Quantity = job.Quantity
+					_, updationErr := jobRepo.Update(job.JobCode, &updatedJob)
+					if updationErr != nil {
+						error += updationErr.Error()
+					}
+				} else {
+					error += "Job " + job.JobCode + " already created.\n"
+				}
 			} else {
 				error += jobCreationError.Error() + "\n"
 			}

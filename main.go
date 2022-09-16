@@ -19,10 +19,6 @@ import (
 )
 
 func main() {
-	// password := "rishabh2791"
-	// hashedPassword, _ := security.Hash(password)
-	// log.Println(string(hashedPassword))
-
 	logger := utilities.NewConsoleLogger()
 	serverConfig := config.NewServerConfig()
 
