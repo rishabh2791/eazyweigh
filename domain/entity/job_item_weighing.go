@@ -50,3 +50,13 @@ func (jobItemWeighing *JobItemWeighing) Validate() error {
 	}
 	return utilities.ConvertMapToError(errors)
 }
+
+type WeighingBatch struct {
+	JobItemWeighing
+	JobItemID         string  `json:"job_item_id"`
+	JobItemMaterialID string  `json:"job_item_material_id"`
+	RequiredWeight    float32 `json:"required_weight"`
+	ActualWeight      float32 `json:"actual_weight"`
+	JobCode           string  `json:"job_code"`
+	JobMaterialID     string  `json:"job_material_id"`
+}

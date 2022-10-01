@@ -4,6 +4,7 @@ import (
 	"eazyweigh/application"
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/value_objects"
+	"eazyweigh/infrastructure/utilities"
 	"encoding/json"
 	"net/http"
 
@@ -130,6 +131,37 @@ func (jobItemWeighingInterface *JobItemWeighingInterface) Update(ctx *gin.Contex
 	response.Status = true
 	response.Message = "Job Weighing Updated."
 	response.Payload = updated
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (jobItemWeighingInterface *JobItemWeighingInterface) Details(ctx *gin.Context) {
+	response := value_objects.Response{}
+
+	conditions := map[string]interface{}{}
+	jsonError := json.NewDecoder(ctx.Request.Body).Decode(&conditions)
+	if jsonError != nil {
+		response.Status = false
+		response.Message = jsonError.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	jobItems, getErr := jobItemWeighingInterface.appStore.JobItemWeighingApp.Details(utilities.ConvertJSONToSQL(conditions))
+	if getErr != nil {
+		response.Status = false
+		response.Message = getErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response.Status = true
+	response.Message = "Job Item Weighing Batches Found"
+	response.Payload = jobItems
 
 	ctx.JSON(http.StatusOK, response)
 }

@@ -126,3 +126,15 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Update(id string, jobItemWeighin
 
 	return &updated, nil
 }
+
+func (jobItemWeighingRepo *JobItemWeighingRepo) Details(conditions string) ([]entity.WeighingBatch, error) {
+	data := []entity.WeighingBatch{}
+	queryString := "SELECT * FROM job_item_weighings LEFT JOIN (SELECT job_items.id as job_item_id, job_items.material_id as job_item_material_id, job_items.required_weight as required_weight, job_items.actual_weight as actual_weight,jobs.job_code as job_code, jobs.material_id as job_material_id FROM job_items LEFT JOIN jobs ON job_items.job_id = jobs.id) as job_items ON job_items.job_item_id = job_item_weighings.job_item_id"
+	if conditions != "" || len(conditions) != 0 {
+		queryString += " WHERE " + conditions
+	} else {
+		queryString += ";"
+	}
+	getErr := jobItemWeighingRepo.DB.Raw(queryString).Find(&data).Error
+	return data, getErr
+}
