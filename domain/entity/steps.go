@@ -18,6 +18,7 @@ type Step struct {
 	MaterialID        string    `json:"material_id" gorm:"size:191;"`
 	Value             float32   `json:"value" gorm:"default:0;"`
 	Sequence          int       `json:"sequence"`
+	Duration          int       `json:"duration"`
 	CreatedByUsername string    `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User     `json:"created_by"`
 	UpdatedByUsername string    `json:"updated_by_username" gorm:"size:20;not null;"`
@@ -30,6 +31,10 @@ func (Step) Tablename() string {
 
 func (step *Step) BeforeCreate(db *gorm.DB) error {
 	step.ID = uuid.New().String()
+	validationErr := step.Validate()
+	if validationErr != nil {
+		return validationErr
+	}
 	return nil
 }
 

@@ -13,6 +13,8 @@ type Process struct {
 	ID                string    `json:"id" gorm:"size:191;not null;unique;primaryKey;"`
 	MaterialID        string    `json:"material_id" gorm:"size:191;not null;"`
 	Material          *Material `json:"material"`
+	VesselID          string    `json:"vessel_id" gorm:"size:191;not null;"`
+	Vessel            *Vessel   `json:"vessel"`
 	Steps             []Step    `json:"steps"`
 	CreatedByUsername string    `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User     `json:"created_by"`

@@ -128,6 +128,7 @@ func ImageUploader(ctx *gin.Context) {
 	}
 
 	extension := strings.Split(header.Filename, ".")[len(strings.Split(header.Filename, "."))-1]
+	imageFile := "public/profile_pics/" + uuid.New().String() + "." + extension
 	filename := "/home/administrator/Development/code/backend/public/profile_pics/" + uuid.New().String() + "." + extension
 	out, err := os.Create(filename)
 	if err != nil {
@@ -151,7 +152,7 @@ func ImageUploader(ctx *gin.Context) {
 
 	response.Status = true
 	response.Message = "Image Uploaded"
-	response.Payload = filename
+	response.Payload = imageFile
 
 	ctx.AbortWithStatusJSON(http.StatusOK, response)
 	return
