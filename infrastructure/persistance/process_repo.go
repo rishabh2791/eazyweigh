@@ -25,10 +25,15 @@ func NewProcessRepo(db *gorm.DB, logger hclog.Logger) *ProcessRepo {
 
 func (processRepo *ProcessRepo) Create(process *entity.Process) (*entity.Process, error) {
 	validationErr := process.Validate()
-	if validationErr == nil {
+	if validationErr != nil {
 		return nil, validationErr
 	}
 
+	existingProcess, _ := processRepo.List("material_id = '" + process.MaterialID + "'")
+	if len(existingProcess) != 0 {
+		revisionNumber := len(existingProcess) + 1
+		process.Version = revisionNumber
+	}
 	creationErr := processRepo.DB.Create(&process).Error
 	return process, creationErr
 }
@@ -53,19 +58,19 @@ func (processRepo *ProcessRepo) Get(materialID string) (*entity.Process, error) 
 		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("Step.StepType.Factory.Address").
-		Preload("Step.StepType.Factory.CreatedBy").
-		Preload("Step.StepType.Factory.CreatedBy.UserRole").
-		Preload("Step.StepType.Factory.UpdatedBy").
-		Preload("Step.StepType.Factory.UpdatedBy.UserRole").
-		Preload("Step.StepType.CreatedBy").
-		Preload("Step.StepType.CreatedBy.UserRole").
-		Preload("Step.StepType.UpdatedBy").
-		Preload("Step.StepType.UpdatedBy.UserRole").
-		Preload("Step.CreatedBy").
-		Preload("Step.UpdatedBy").
-		Preload("Step.CreatedBy.UserRole").
-		Preload("Step.UpdatedBy.UserRole").
+		Preload("Steps.StepType.Factory.Address").
+		Preload("Steps.StepType.Factory.CreatedBy").
+		Preload("Steps.StepType.Factory.CreatedBy.UserRole").
+		Preload("Steps.StepType.Factory.UpdatedBy").
+		Preload("Steps.StepType.Factory.UpdatedBy.UserRole").
+		Preload("Steps.StepType.CreatedBy").
+		Preload("Steps.StepType.CreatedBy.UserRole").
+		Preload("Steps.StepType.UpdatedBy").
+		Preload("Steps.StepType.UpdatedBy.UserRole").
+		Preload("Steps.CreatedBy").
+		Preload("Steps.UpdatedBy").
+		Preload("Steps.CreatedBy.UserRole").
+		Preload("Steps.UpdatedBy.UserRole").
 		Preload(clause.Associations).Where("material_id = ?", materialID).First(&process).Error
 	return &process, getErr
 }
@@ -90,19 +95,19 @@ func (processRepo *ProcessRepo) List(conditions string) ([]entity.Process, error
 		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("Step.StepType.Factory.Address").
-		Preload("Step.StepType.Factory.CreatedBy").
-		Preload("Step.StepType.Factory.CreatedBy.UserRole").
-		Preload("Step.StepType.Factory.UpdatedBy").
-		Preload("Step.StepType.Factory.UpdatedBy.UserRole").
-		Preload("Step.StepType.CreatedBy").
-		Preload("Step.StepType.CreatedBy.UserRole").
-		Preload("Step.StepType.UpdatedBy").
-		Preload("Step.StepType.UpdatedBy.UserRole").
-		Preload("Step.CreatedBy").
-		Preload("Step.UpdatedBy").
-		Preload("Step.CreatedBy.UserRole").
-		Preload("Step.UpdatedBy.UserRole").
+		Preload("Steps.StepType.Factory.Address").
+		Preload("Steps.StepType.Factory.CreatedBy").
+		Preload("Steps.StepType.Factory.CreatedBy.UserRole").
+		Preload("Steps.StepType.Factory.UpdatedBy").
+		Preload("Steps.StepType.Factory.UpdatedBy.UserRole").
+		Preload("Steps.StepType.CreatedBy").
+		Preload("Steps.StepType.CreatedBy.UserRole").
+		Preload("Steps.StepType.UpdatedBy").
+		Preload("Steps.StepType.UpdatedBy.UserRole").
+		Preload("Steps.CreatedBy").
+		Preload("Steps.UpdatedBy").
+		Preload("Steps.CreatedBy.UserRole").
+		Preload("Steps.UpdatedBy.UserRole").
 		Preload(clause.Associations).Where(conditions).Find(&processes).Error
 	return processes, getErr
 }

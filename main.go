@@ -16,11 +16,20 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-hclog"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	logger := utilities.NewConsoleLogger()
 	serverConfig := config.NewServerConfig()
+	dotenvLoadError := godotenv.Load("/home/administrator/Development/code/backend/variables.env")
+	if serverConfig.IsDebug() {
+		dotenvLoadError = godotenv.Load("./variables.env")
+	}
+	if dotenvLoadError != nil {
+		logger.Error(dotenvLoadError.Error())
+		os.Exit(1)
+	}
 
 	repoStore, repoError := persistance.NewRepoStore(serverConfig, logger)
 	if repoError != nil {

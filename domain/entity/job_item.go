@@ -24,6 +24,7 @@ type JobItem struct {
 	Assigned          bool              `json:"assigned" gorm:"default:false;"`
 	Complete          bool              `json:"complete" gorm:"default:false;"`
 	Verified          bool              `json:"verified" gorm:"default:false;"`
+	Added             bool              `json:"added" gorm:"default:false;"`
 	CreatedByUsername string            `json:"created_by_username" gorm:"size:20;not null;"`
 	CreatedBy         *User             `json:"created_by"`
 	UpdatedByUsername string            `json:"updated_by_username" gorm:"size:20;not null;"`

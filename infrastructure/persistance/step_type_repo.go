@@ -78,7 +78,7 @@ func (stepTypeRepo *StepTypeRepo) Update(id string, stepType *entity.StepType) (
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy").
 		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("id = ?", stepType).First(&existingStepType).Error
+		Preload(clause.Associations).Where("id = ?", id).First(&existingStepType).Error
 
 	if getErr != nil {
 		return nil, getErr
