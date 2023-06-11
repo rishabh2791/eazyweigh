@@ -17,15 +17,20 @@ func NewDeviceDataApp(devcieDataRepository repository.DeviceDataRepository) *Dev
 	}
 }
 
-func (deviceDataApp *DeviceDataApp) Create(device *entity.DeviceData) (*entity.DeviceData, error) {
-	return deviceDataApp.devicedataRepository.Create(device)
+func (deviceDataApp *DeviceDataApp) Create(deviceData *entity.DeviceData) (*entity.DeviceData, error) {
+	return deviceDataApp.devicedataRepository.Create(deviceData)
 }
 
-func (deviceDataApp *DeviceDataApp) GetForDevice(deviceID string, conditions string) ([]entity.DeviceData, error) {
-	return deviceDataApp.devicedataRepository.GetForDevice(deviceID, conditions)
+func (deviceDataApp *DeviceDataApp) Get(id string) (*entity.DeviceData, error) {
+	return deviceDataApp.devicedataRepository.Get(id)
+}
+
+func (deviceDataApp *DeviceDataApp) List(conditions string) ([]entity.DeviceData, error) {
+	return deviceDataApp.devicedataRepository.List(conditions)
 }
 
 type DeviceDataAppInterface interface {
-	Create(device *entity.DeviceData) (*entity.DeviceData, error)
-	GetForDevice(deviceID string, conditions string) ([]entity.DeviceData, error)
+	Create(*entity.DeviceData) (*entity.DeviceData, error)
+	Get(string) (*entity.DeviceData, error)
+	List(string) ([]entity.DeviceData, error)
 }

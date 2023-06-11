@@ -27,17 +27,6 @@ func NewDeviceDataInterface(appStore *application.AppStore, logger hclog.Logger)
 func (deviceDataInterface *DeviceDataInterface) Create(ctx *gin.Context) {
 	response := value_objects.Response{}
 
-	requestingUser, ok := ctx.Get("user")
-	if !ok {
-		response.Status = false
-		response.Message = "Anonymous User"
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
-	user := requestingUser.(*entity.User)
-
 	model := entity.DeviceData{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
@@ -48,9 +37,6 @@ func (deviceDataInterface *DeviceDataInterface) Create(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
-
-	model.CreatedByUsername = user.Username
-	model.UpdatedByUsername = user.Username
 
 	created, creationErr := deviceDataInterface.appStore.DeviceDataApp.Create(&model)
 	if creationErr != nil {
@@ -69,9 +55,29 @@ func (deviceDataInterface *DeviceDataInterface) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+func (deviceDataInterface *DeviceDataInterface) Get(ctx *gin.Context) {
+	response := value_objects.Response{}
+	id := ctx.Param("id")
+
+	device, getErr := deviceDataInterface.appStore.DeviceDataApp.Get(id)
+	if getErr != nil {
+		response.Status = false
+		response.Message = getErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response.Status = true
+	response.Message = "Device Data Found"
+	response.Payload = device
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func (deviceDataInterface *DeviceDataInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
-	deviceID := ctx.Param("deviceID")
 
 	conditions := map[string]interface{}{}
 	jsonError := json.NewDecoder(ctx.Request.Body).Decode(&conditions)
@@ -84,7 +90,7 @@ func (deviceDataInterface *DeviceDataInterface) List(ctx *gin.Context) {
 		return
 	}
 
-	device, getErr := deviceDataInterface.appStore.DeviceDataApp.GetForDevice(deviceID, utilities.ConvertJSONToSQL(conditions))
+	device, getErr := deviceDataInterface.appStore.DeviceDataApp.List(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()

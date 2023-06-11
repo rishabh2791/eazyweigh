@@ -37,6 +37,7 @@ func (deviceRepo *DeviceRepo) Get(id string) (*entity.Device, error) {
 	device := entity.Device{}
 
 	getErr := deviceRepo.DB.
+		Preload("Vessel.Factory").
 		Preload("Vessel.Factory.Address").
 		Preload("Vessel.Factory.CreatedBy").
 		Preload("Vessel.Factory.CreatedBy.UserRole").
@@ -48,10 +49,16 @@ func (deviceRepo *DeviceRepo) Get(id string) (*entity.Device, error) {
 		Preload("Vessel.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("DeviceData.CreatedBy").
-		Preload("DeviceData.UpdatedBy").
-		Preload("DeviceData.CreatedBy.UserRole").
-		Preload("DeviceData.UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
 		Preload(clause.Associations).Where("id = ?", id).First(&device).Error
 	return &device, getErr
 }
@@ -60,6 +67,7 @@ func (deviceRepo *DeviceRepo) List(conditions string) ([]entity.Device, error) {
 	devices := []entity.Device{}
 
 	getErr := deviceRepo.DB.
+		Preload("Vessel.Factory").
 		Preload("Vessel.Factory.Address").
 		Preload("Vessel.Factory.CreatedBy").
 		Preload("Vessel.Factory.CreatedBy.UserRole").
@@ -71,10 +79,16 @@ func (deviceRepo *DeviceRepo) List(conditions string) ([]entity.Device, error) {
 		Preload("Vessel.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("DeviceData.CreatedBy").
-		Preload("DeviceData.UpdatedBy").
-		Preload("DeviceData.CreatedBy.UserRole").
-		Preload("DeviceData.UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
 		Preload(clause.Associations).Where(conditions).Find(&devices).Error
 	return devices, getErr
 }
@@ -94,7 +108,7 @@ func (deviceRepo *DeviceRepo) Update(id string, device *entity.Device) (*entity.
 	}
 
 	updated := entity.Device{}
-	deviceRepo.DB.
+	deviceRepo.DB.Preload("Vessel.Factory").
 		Preload("Vessel.Factory.Address").
 		Preload("Vessel.Factory.CreatedBy").
 		Preload("Vessel.Factory.CreatedBy.UserRole").
@@ -106,10 +120,16 @@ func (deviceRepo *DeviceRepo) Update(id string, device *entity.Device) (*entity.
 		Preload("Vessel.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
-		Preload("DeviceData.CreatedBy").
-		Preload("DeviceData.UpdatedBy").
-		Preload("DeviceData.CreatedBy.UserRole").
-		Preload("DeviceData.UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
 		Preload(clause.Associations).Where("id = ?", id).First(&updated)
 
 	return &updated, nil

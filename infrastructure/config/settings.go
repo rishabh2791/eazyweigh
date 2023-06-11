@@ -3,7 +3,7 @@ package config
 var debug = true
 
 var defaultsettings = map[string]string{
-	"server_address": "localhost",
+	"server_address": "192.168.50.227",
 	"server_port":    "8000",
 	"db_host":        "localhost",
 	"db_port":        "3306",

@@ -25,6 +25,7 @@ func NewVesselRepo(db *gorm.DB, logger hclog.Logger) *VesselRepo {
 
 func (vesselRepo *VesselRepo) Create(vessel *entity.Vessel) (*entity.Vessel, error) {
 	validationErr := vessel.Validate()
+
 	if validationErr != nil {
 		return nil, validationErr
 	}

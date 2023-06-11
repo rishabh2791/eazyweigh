@@ -22,6 +22,7 @@ func NewDeviceDataRouter(router *gin.RouterGroup, interfaceStore *interfaces.Int
 }
 
 func (router *DeviceDataRouter) ServeRoutes() {
-	router.router.POST("/create/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.DeviceDataInterface.Create)
-	router.router.GET("/:deviceID/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.DeviceDataInterface.List)
+	router.router.POST("/create/", router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.DeviceDataInterface.Create)
+	router.router.GET("/:id/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.DeviceDataInterface.Get)
+	router.router.POST("/", router.middlewares.AuthMiddleware.ValidateAccessToken(), router.middlewares.PermissionMiddleware.HasPermission(), router.interfaceStore.DeviceDataInterface.List)
 }

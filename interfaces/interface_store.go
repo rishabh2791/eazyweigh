@@ -18,6 +18,7 @@ type InterfaceStore struct {
 	CommonInterface            *CommonInterface
 	DeviceInterface            *DeviceInterface
 	DeviceDataInterface        *DeviceDataInterface
+	DeviceTypeInterface        *DeviceTypeInterface
 	FactoryInterface           *FactoryInterface
 	JobInterface               *JobInterface
 	JobItemInterface           *JobItemInterface
@@ -56,6 +57,7 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.CommonInterface = NewCommonInterface(appStore, logger)
 	interfaceStore.DeviceInterface = NewDeviceInterface(appStore, logger)
 	interfaceStore.DeviceDataInterface = NewDeviceDataInterface(appStore, logger)
+	interfaceStore.DeviceTypeInterface = NewDeviceTypeInterface(appStore, logger)
 	interfaceStore.FactoryInterface = NewFactoryInterface(appStore, logger)
 	interfaceStore.JobInterface = NewJobInterface(appStore, logger)
 	interfaceStore.JobItemInterface = NewJobItemInterface(appStore, logger)

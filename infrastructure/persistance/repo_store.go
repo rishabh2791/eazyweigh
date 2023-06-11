@@ -2,6 +2,7 @@ package persistance
 
 import (
 	"eazyweigh/domain/entity"
+	"eazyweigh/domain/repository"
 	"eazyweigh/infrastructure/config"
 	"net/url"
 	"os"
@@ -19,38 +20,39 @@ type RepoStore struct {
 	WarehouseDB                 *gorm.DB
 	Cache                       *redis.Client
 	Logger                      hclog.Logger
-	AddressRepo                 *AddressRepo
-	AuthRepo                    *AuthRepo
-	BatchRepo                   *BatchRepo
-	BOMRepo                     *BOMRepo
-	BOMItemRepo                 *BOMItemRepo
-	CommonRepo                  *CommonRepo
-	CompanyRepo                 *CompanyRepo
-	DeviceRepo                  *DeviceRepo
-	DeviceDataRepo              *DeviceDataRepo
-	FactoryRepo                 *FactoryRepo
-	JobRepo                     *JobRepo
-	JobItemRepo                 *JobItemRepo
-	JobItemAssignmentRepo       *JobItemAssignmentRepo
-	JobItemWeighingRepo         *JobItemWeighingRepo
-	MaterialRepo                *MaterialRepo
-	OverIssueRepo               *OverIssueRepo
-	ProcessRepo                 *ProcessRepo
-	ScannedDataRepo             *ScannedDataRepo
-	ShiftRepo                   *ShiftRepo
-	ShiftScheduleRepo           *ShiftScheduleRepo
-	StepRepo                    *StepRepo
-	StepTypeRepo                *StepTypeRepo
-	TerminalRepo                *TerminalRepo
-	UnderIssueRepo              *UnderIssueRepo
-	UnitOfMeasureRepo           *UnitOfMeasureRepo
-	UnitOfMeasureConversionRepo *UnitOfMeasureConversionRepo
-	UserRepo                    *UserRepo
-	UserRoleRepo                *UserRoleRepo
-	UserRoleAccessRepo          *UserRoleAccessRepo
-	UserCompanyRepo             *UserCompanyRepo
-	UserFactoryRepo             *UserFactoryRepo
-	VesselRepo                  *VesselRepo
+	AddressRepo                 repository.AddressRepository
+	AuthRepo                    repository.AuthRepository
+	BatchRepo                   repository.BatchRepository
+	BOMRepo                     repository.BOMRepository
+	BOMItemRepo                 repository.BOMItemsRepository
+	CommonRepo                  repository.CommonRepository
+	CompanyRepo                 repository.CompanyRepository
+	DeviceRepo                  repository.DeviceRepository
+	DeviceDataRepo              repository.DeviceDataRepository
+	DeviceTypeRepo              repository.DeviceTypeRepository
+	FactoryRepo                 repository.FactoryRepository
+	JobRepo                     repository.JobRepository
+	JobItemRepo                 repository.JobItemRepository
+	JobItemAssignmentRepo       repository.JobItemAssignmentRepository
+	JobItemWeighingRepo         repository.JobItemWeighingRepository
+	MaterialRepo                repository.MaterialRepository
+	OverIssueRepo               repository.OverIssueRepository
+	ProcessRepo                 repository.ProcessRepository
+	ScannedDataRepo             repository.ScannedDataRepository
+	ShiftRepo                   repository.ShiftRepository
+	ShiftScheduleRepo           repository.ShiftScheduleRepository
+	StepRepo                    repository.StepRepository
+	StepTypeRepo                repository.StepTypeRepository
+	TerminalRepo                repository.TerminalRepository
+	UnderIssueRepo              repository.UnderIssueRepository
+	UnitOfMeasureRepo           repository.UnitOfMeasureRepository
+	UnitOfMeasureConversionRepo repository.UnitOfMeasureConversionRepository
+	UserRepo                    repository.UserRepository
+	UserRoleRepo                repository.UserRoleRepository
+	UserRoleAccessRepo          repository.UserRoleAccessRepository
+	UserCompanyRepo             repository.UserCompanyRepository
+	UserFactoryRepo             repository.UserFactoryRepository
+	VesselRepo                  repository.VesselRepository
 }
 
 func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*RepoStore, error) {
@@ -104,6 +106,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.CommonRepo = NewCommonRepo(gormDB, logging)
 	repoStore.DeviceRepo = NewDeviceRepo(gormDB, logging)
 	repoStore.DeviceDataRepo = NewDeviceDataRepo(gormDB, logging)
+	repoStore.DeviceTypeRepo = NewDeviceTypeRepo(gormDB, logging)
 	repoStore.FactoryRepo = NewFactoryRepo(gormDB, logging)
 	repoStore.JobRepo = NewJobRepo(gormDB, remoteSQLDB, logging)
 	repoStore.JobItemRepo = NewJobItemRepo(gormDB, logging)
@@ -163,6 +166,7 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.Process{},
 		&entity.Step{},
 		&entity.Vessel{},
+		&entity.DeviceType{},
 		&entity.Device{},
 		&entity.DeviceData{},
 		&entity.Batch{},

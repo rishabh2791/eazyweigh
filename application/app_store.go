@@ -12,6 +12,7 @@ type AppStore struct {
 	CommonApp                  *CommonApp
 	DeviceApp                  *DeviceApp
 	DeviceDataApp              *DeviceDataApp
+	DeviceTypeApp              *DeviceTypeApp
 	FactoryApp                 *FactoryApp
 	JobApp                     *JobApp
 	JobItemApp                 *JobItemApp
@@ -48,6 +49,7 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.CommonApp = NewCommonApp(repoStore.CommonRepo)
 	appStore.DeviceApp = NewDeviceApp(repoStore.DeviceRepo)
 	appStore.DeviceDataApp = NewDeviceDataApp(repoStore.DeviceDataRepo)
+	appStore.DeviceTypeApp = NewDeviceTypeApp(repoStore.DeviceTypeRepo)
 	appStore.FactoryApp = NewFactoryRepository(repoStore.FactoryRepo)
 	appStore.JobApp = NewJobApp(repoStore.JobRepo)
 	appStore.JobItemApp = NewJobItemApp(repoStore.JobItemRepo)

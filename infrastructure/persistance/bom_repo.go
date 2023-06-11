@@ -12,12 +12,12 @@ import (
 type BOMRepo struct {
 	DB          *gorm.DB
 	Logger      hclog.Logger
-	bomItemRepo *BOMItemRepo
+	bomItemRepo repository.BOMItemsRepository
 }
 
 var _ repository.BOMRepository = &BOMRepo{}
 
-func NewBOMRepo(db *gorm.DB, logger hclog.Logger, bomItemRepo *BOMItemRepo) *BOMRepo {
+func NewBOMRepo(db *gorm.DB, logger hclog.Logger, bomItemRepo repository.BOMItemsRepository) *BOMRepo {
 	return &BOMRepo{
 		DB:          db,
 		Logger:      logger,
