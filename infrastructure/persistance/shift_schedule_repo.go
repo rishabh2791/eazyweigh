@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type ShiftScheduleRepo struct {
@@ -40,21 +39,7 @@ func (shift *ShiftScheduleRepo) Create(shiftSchedule *entity.ShiftSchedule) (*en
 func (shift *ShiftScheduleRepo) List(conditions string) ([]entity.ShiftSchedule, error) {
 	shiftSchedule := []entity.ShiftSchedule{}
 
-	getErr := shift.DB.
-		Preload("User.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload("Shift.CreatedBy").
-		Preload("Shift.CreatedBy.UserRole").
-		Preload("Shift.UpdatedBy").
-		Preload("Shift.UpdatedBy.UserRole").
-		Preload("Shift.Factory").
-		Preload("Shift.Factory.Address").
-		Preload("Shift.Factory.CreatedBy").
-		Preload("Shift.Factory.CreatedBy.UserRole").
-		Preload("Shift.Factory.UpdatedBy").
-		Preload("Shift.Factory.UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(&shiftSchedule).Error
+	getErr := shift.DB.Where(conditions).Find(&shiftSchedule).Error
 	if getErr != nil {
 		return nil, getErr
 	}

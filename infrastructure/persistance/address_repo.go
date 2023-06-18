@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type AddressRepo struct {
@@ -38,7 +37,7 @@ func (addressRepo *AddressRepo) Create(address *entity.Address) (*entity.Address
 
 func (addressRepo *AddressRepo) List(conditions string) ([]entity.Address, error) {
 	addresses := []entity.Address{}
-	getErr := addressRepo.DB.Preload(clause.Associations).Where(conditions).Find(&addresses).Error
+	getErr := addressRepo.DB.Where(conditions).Find(&addresses).Error
 	if getErr != nil {
 		return nil, getErr
 	}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type DeviceTypeRepo struct {
@@ -34,15 +33,7 @@ func (deviceTypeRepo *DeviceTypeRepo) Create(deviceType *entity.DeviceType) (*en
 func (deviceTypeRepo *DeviceTypeRepo) Get(id string) (*entity.DeviceType, error) {
 	deviceType := entity.DeviceType{}
 
-	getErr := deviceTypeRepo.DB.
-		Preload("Factory.Address").
-		Preload("Factory.CreatedBy").
-		Preload("Factory.CreatedBy.UserRole").
-		Preload("Factory.UpdatedBy").
-		Preload("Factory.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("id = ?", id).First(&deviceType).Error
+	getErr := deviceTypeRepo.DB.Where("id = ?", id).First(&deviceType).Error
 
 	return &deviceType, getErr
 }
@@ -50,15 +41,7 @@ func (deviceTypeRepo *DeviceTypeRepo) Get(id string) (*entity.DeviceType, error)
 func (deviceTypeRepo *DeviceTypeRepo) List(conditions string) ([]entity.DeviceType, error) {
 	deviceTypes := []entity.DeviceType{}
 
-	getErr := deviceTypeRepo.DB.
-		Preload("Factory.Address").
-		Preload("Factory.CreatedBy").
-		Preload("Factory.CreatedBy.UserRole").
-		Preload("Factory.UpdatedBy").
-		Preload("Factory.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(&deviceTypes).Error
+	getErr := deviceTypeRepo.DB.Where(conditions).Find(&deviceTypes).Error
 
 	return deviceTypes, getErr
 }
@@ -66,8 +49,7 @@ func (deviceTypeRepo *DeviceTypeRepo) List(conditions string) ([]entity.DeviceTy
 func (deviceTypeRepo *DeviceTypeRepo) Update(id string, deviceType *entity.DeviceType) (*entity.DeviceType, error) {
 	existingDeviceType := entity.DeviceType{}
 
-	getErr := deviceTypeRepo.DB.
-		Preload(clause.Associations).Where("id = ?", id).First(&existingDeviceType).Error
+	getErr := deviceTypeRepo.DB.Where("id = ?", id).First(&existingDeviceType).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -78,15 +60,7 @@ func (deviceTypeRepo *DeviceTypeRepo) Update(id string, deviceType *entity.Devic
 	}
 
 	updated := entity.DeviceType{}
-	deviceTypeRepo.DB.
-		Preload("Factory.Address").
-		Preload("Factory.CreatedBy").
-		Preload("Factory.CreatedBy.UserRole").
-		Preload("Factory.UpdatedBy").
-		Preload("Factory.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("id = ?", id).First(&updated)
+	deviceTypeRepo.DB.Where("id = ?", id).First(&updated)
 
 	return &updated, nil
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type UnitOfMeasureConversionRepo struct {
@@ -30,7 +29,7 @@ func (conversionRepo *UnitOfMeasureConversionRepo) Create(conversion *entity.Uni
 	}
 
 	existingConversion := entity.UnitOfMeasureConversion{}
-	getErr := conversionRepo.DB.Preload(clause.Associations).Where("unit_of_measure1_id = ? AND unit_of_measure2_id = ?", conversion.UnitOfMeasure1ID, conversion.UnitOfMeasure2ID).Take(&existingConversion).Error
+	getErr := conversionRepo.DB.Where("unit_of_measure1_id = ? AND unit_of_measure2_id = ?", conversion.UnitOfMeasure1ID, conversion.UnitOfMeasure2ID).Take(&existingConversion).Error
 	if getErr != nil {
 		creationErr := conversionRepo.DB.Create(&conversion).Error
 		if creationErr != nil {
@@ -49,7 +48,7 @@ func (conversionRepo *UnitOfMeasureConversionRepo) Create(conversion *entity.Uni
 func (conversionRepo *UnitOfMeasureConversionRepo) Get(id string) (*entity.UnitOfMeasureConversion, error) {
 	conversion := entity.UnitOfMeasureConversion{}
 
-	getErr := conversionRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&conversion).Error
+	getErr := conversionRepo.DB.Where("id = ?", id).Take(&conversion).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -60,30 +59,7 @@ func (conversionRepo *UnitOfMeasureConversionRepo) Get(id string) (*entity.UnitO
 func (conversionRepo *UnitOfMeasureConversionRepo) List(conditions string) ([]entity.UnitOfMeasureConversion, error) {
 	conversions := []entity.UnitOfMeasureConversion{}
 
-	getErr := conversionRepo.DB.
-		Preload("UnitOfMeasure1.Factory").
-		Preload("UnitOfMeasure1.Factory.Address").
-		Preload("UnitOfMeasure1.Factory.CreatedBy").
-		Preload("UnitOfMeasure1.Factory.CreatedBy.UserRole").
-		Preload("UnitOfMeasure1.Factory.UpdatedBy").
-		Preload("UnitOfMeasure1.Factory.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure1.CreatedBy").
-		Preload("UnitOfMeasure1.CreatedBy.UserRole").
-		Preload("UnitOfMeasure1.UpdatedBy").
-		Preload("UnitOfMeasure1.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure2.Factory").
-		Preload("UnitOfMeasure2.Factory.Address").
-		Preload("UnitOfMeasure2.Factory.CreatedBy").
-		Preload("UnitOfMeasure2.Factory.CreatedBy.UserRole").
-		Preload("UnitOfMeasure2.Factory.UpdatedBy").
-		Preload("UnitOfMeasure2.Factory.UpdatedBy.UserRole").
-		Preload("UnitOfMeasure2.CreatedBy").
-		Preload("UnitOfMeasure2.CreatedBy.UserRole").
-		Preload("UnitOfMeasure2.UpdatedBy").
-		Preload("UnitOfMeasure2.UpdatedBy.UserRole").
-		Preload("CreatedBy.UserRole").
-		Preload("UpdatedBy.UserRole").
-		Preload(clause.Associations).Where(conditions).Find(&conversions).Error
+	getErr := conversionRepo.DB.Where(conditions).Find(&conversions).Error
 	if getErr != nil {
 		return nil, getErr
 	}

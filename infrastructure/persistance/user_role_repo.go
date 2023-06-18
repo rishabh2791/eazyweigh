@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type UserRoleRepo struct {
@@ -35,9 +34,9 @@ func (userRoleRepo *UserRoleRepo) Create(userRole *entity.UserRole) (*entity.Use
 	return userRole, nil
 }
 
-func (userRoleRepo *UserRoleRepo) Get(userRole string) (*entity.UserRole, error) {
+func (userRoleRepo *UserRoleRepo) Get(userRoleID string) (*entity.UserRole, error) {
 	role := entity.UserRole{}
-	getErr := userRoleRepo.DB.Preload(clause.Associations).Take(&role).Error
+	getErr := userRoleRepo.DB.Where("id = ?", userRoleID).Take(&role).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -46,7 +45,7 @@ func (userRoleRepo *UserRoleRepo) Get(userRole string) (*entity.UserRole, error)
 
 func (userRoleRepo *UserRoleRepo) List(conditions string) ([]entity.UserRole, error) {
 	roles := []entity.UserRole{}
-	getErr := userRoleRepo.DB.Preload(clause.Associations).Where(conditions).Find(&roles).Error
+	getErr := userRoleRepo.DB.Where(conditions).Find(&roles).Error
 	if getErr != nil {
 		return nil, getErr
 	}

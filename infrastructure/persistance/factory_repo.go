@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type FactoryRepo struct {
@@ -40,7 +39,7 @@ func (factoryRepo *FactoryRepo) Create(factory *entity.Factory) (*entity.Factory
 func (factoryRepo *FactoryRepo) Get(id string) (*entity.Factory, error) {
 	factory := entity.Factory{}
 
-	getErr := factoryRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&factory).Error
+	getErr := factoryRepo.DB.Where("id = ?", id).Take(&factory).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -51,8 +50,7 @@ func (factoryRepo *FactoryRepo) Get(id string) (*entity.Factory, error) {
 func (factoryRepo *FactoryRepo) List(conditions string) ([]entity.Factory, error) {
 	factories := []entity.Factory{}
 
-	getErr := factoryRepo.DB.
-		Preload("CreatedBy.UserRole").Preload("UpdatedBy.UserRole").Preload(clause.Associations).Where(conditions).Find(&factories).Error
+	getErr := factoryRepo.DB.Where(conditions).Find(&factories).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -63,7 +61,7 @@ func (factoryRepo *FactoryRepo) List(conditions string) ([]entity.Factory, error
 func (factoryRepo *FactoryRepo) Update(id string, factory *entity.Factory) (*entity.Factory, error) {
 	existingFactory := entity.Factory{}
 
-	getErr := factoryRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingFactory).Error
+	getErr := factoryRepo.DB.Where("id = ?", id).Take(&existingFactory).Error
 	if getErr != nil {
 		return nil, getErr
 	}
