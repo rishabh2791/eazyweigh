@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type StepRepo struct {
@@ -35,14 +36,38 @@ func (stepRepo *StepRepo) Create(step *entity.Step) (*entity.Step, error) {
 func (stepRepo *StepRepo) Get(id string) (*entity.Step, error) {
 	step := entity.Step{}
 
-	getErr := stepRepo.DB.Where("id = ?", id).First(&step).Error
+	getErr := stepRepo.DB.
+		Preload("StepType.Factory.Address").
+		Preload("StepType.Factory.CreatedBy").
+		Preload("StepType.Factory.CreatedBy.UserRole").
+		Preload("StepType.Factory.UpdatedBy").
+		Preload("StepType.Factory.UpdatedBy.UserRole").
+		Preload("StepType.CreatedBy").
+		Preload("StepType.CreatedBy.UserRole").
+		Preload("StepType.UpdatedBy").
+		Preload("StepType.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", id).First(&step).Error
 	return &step, getErr
 }
 
 func (stepRepo *StepRepo) List(conditions string) ([]entity.Step, error) {
 	steps := []entity.Step{}
 
-	getErr := stepRepo.DB.Where(conditions).Find(&steps).Error
+	getErr := stepRepo.DB.
+		Preload("StepType.Factory.Address").
+		Preload("StepType.Factory.CreatedBy").
+		Preload("StepType.Factory.CreatedBy.UserRole").
+		Preload("StepType.Factory.UpdatedBy").
+		Preload("StepType.Factory.UpdatedBy.UserRole").
+		Preload("StepType.CreatedBy").
+		Preload("StepType.CreatedBy.UserRole").
+		Preload("StepType.UpdatedBy").
+		Preload("StepType.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&steps).Error
 
 	return steps, getErr
 }
@@ -50,7 +75,8 @@ func (stepRepo *StepRepo) List(conditions string) ([]entity.Step, error) {
 func (stepRepo *StepRepo) Update(id string, step *entity.Step) (*entity.Step, error) {
 	existingStep := entity.Step{}
 
-	getErr := stepRepo.DB.Where("id = ?", id).First(&existingStep).Error
+	getErr := stepRepo.DB.
+		Preload(clause.Associations).Where("id = ?", id).First(&existingStep).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -61,6 +87,18 @@ func (stepRepo *StepRepo) Update(id string, step *entity.Step) (*entity.Step, er
 	}
 
 	updated := entity.Step{}
-	stepRepo.DB.Where("id = ?", id).First(&updated)
+	stepRepo.DB.
+		Preload("StepType.Factory.Address").
+		Preload("StepType.Factory.CreatedBy").
+		Preload("StepType.Factory.CreatedBy.UserRole").
+		Preload("StepType.Factory.UpdatedBy").
+		Preload("StepType.Factory.UpdatedBy.UserRole").
+		Preload("StepType.CreatedBy").
+		Preload("StepType.CreatedBy.UserRole").
+		Preload("StepType.UpdatedBy").
+		Preload("StepType.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", id).First(&updated)
 	return &updated, nil
 }

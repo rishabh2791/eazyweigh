@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UnitOfMeasureRepo struct {
@@ -37,7 +38,7 @@ func (uomRepo *UnitOfMeasureRepo) Create(uom *entity.UnitOfMeasure) (*entity.Uni
 func (uomRepo *UnitOfMeasureRepo) Get(id string) (*entity.UnitOfMeasure, error) {
 	uom := entity.UnitOfMeasure{}
 
-	getErr := uomRepo.DB.Where("id = ?", id).Take(&uom).Error
+	getErr := uomRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&uom).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -48,7 +49,14 @@ func (uomRepo *UnitOfMeasureRepo) Get(id string) (*entity.UnitOfMeasure, error) 
 func (uomRepo *UnitOfMeasureRepo) List(conditions string) ([]entity.UnitOfMeasure, error) {
 	uoms := []entity.UnitOfMeasure{}
 
-	getErr := uomRepo.DB.Where(conditions).Find(&uoms).Error
+	getErr := uomRepo.DB.Preload("Factory.Address").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&uoms).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -58,7 +66,7 @@ func (uomRepo *UnitOfMeasureRepo) List(conditions string) ([]entity.UnitOfMeasur
 func (uomRepo *UnitOfMeasureRepo) Update(id string, uom *entity.UnitOfMeasure) (*entity.UnitOfMeasure, error) {
 	existingUOM := entity.UnitOfMeasure{}
 
-	getErr := uomRepo.DB.Where("id = ?", id).Take(&existingUOM).Error
+	getErr := uomRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingUOM).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -69,7 +77,7 @@ func (uomRepo *UnitOfMeasureRepo) Update(id string, uom *entity.UnitOfMeasure) (
 	}
 
 	updated := entity.UnitOfMeasure{}
-	uomRepo.DB.Where("id = ?", id).Take(&updated)
+	uomRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

@@ -24,6 +24,6 @@ func NewJobItemRouter(router *gin.RouterGroup, iStore *interfaces.InterfaceStore
 func (jobItemRouter *JobItemRouter) ServeRoutes() {
 	jobItemRouter.router.POST("/create/", jobItemRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemRouter.interfaceStore.JobItemInterface.Create)
 	jobItemRouter.router.POST("/create/multi/", jobItemRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemRouter.interfaceStore.JobItemInterface.CreateMultiple)
-	jobItemRouter.router.POST("/", jobItemRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemRouter.interfaceStore.JobItemInterface.Get)
+	jobItemRouter.router.POST("/:id/", jobItemRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemRouter.interfaceStore.JobItemInterface.Get)
 	jobItemRouter.router.PATCH("/:id/", jobItemRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemRouter.interfaceStore.JobItemInterface.Update)
 }

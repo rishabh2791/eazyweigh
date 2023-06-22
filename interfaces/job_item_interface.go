@@ -120,6 +120,7 @@ func (jobItemsInterface *JobItemInterface) CreateMultiple(ctx *gin.Context) {
 
 func (jobItemsInterface *JobItemInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
+	id := ctx.Param("id")
 
 	conditions := map[string]interface{}{}
 	jsonError := json.NewDecoder(ctx.Request.Body).Decode(&conditions)
@@ -132,7 +133,7 @@ func (jobItemsInterface *JobItemInterface) Get(ctx *gin.Context) {
 		return
 	}
 
-	jobItems, getErr := jobItemsInterface.appStore.JobItemApp.Get(utilities.ConvertJSONToSQL(conditions))
+	jobItems, getErr := jobItemsInterface.appStore.JobItemApp.Get(id, utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()

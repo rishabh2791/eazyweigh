@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type DeviceDataRepo struct {
@@ -36,7 +37,8 @@ func (deviceDataRepo *DeviceDataRepo) Create(device *entity.DeviceData) (*entity
 func (deviceDataRepo *DeviceDataRepo) Get(id string) (*entity.DeviceData, error) {
 	deviceData := entity.DeviceData{}
 
-	getErr := deviceDataRepo.DB.Where("id = ?", id).Take(&deviceData).Error
+	getErr := deviceDataRepo.DB.
+		Preload(clause.Associations).Where("id = ?", id).Take(&deviceData).Error
 
 	return &deviceData, getErr
 }
@@ -44,6 +46,7 @@ func (deviceDataRepo *DeviceDataRepo) Get(id string) (*entity.DeviceData, error)
 func (deviceDataRepo *DeviceDataRepo) List(conditions string) ([]entity.DeviceData, error) {
 	deviceData := []entity.DeviceData{}
 
-	getErr := deviceDataRepo.DB.Where(conditions).Find(&deviceData).Error
+	getErr := deviceDataRepo.DB.
+		Preload(clause.Associations).Where(conditions).Find(&deviceData).Error
 	return deviceData, getErr
 }

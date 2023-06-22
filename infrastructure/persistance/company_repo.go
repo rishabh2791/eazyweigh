@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CompanyRepo struct {
@@ -39,7 +40,7 @@ func (companyRepo *CompanyRepo) Create(company *entity.Company) (*entity.Company
 func (companyRepo *CompanyRepo) Get(id int) (*entity.Company, error) {
 	company := entity.Company{}
 
-	getErr := companyRepo.DB.Where("id = ?", id).Take(&company).Error
+	getErr := companyRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&company).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -50,7 +51,7 @@ func (companyRepo *CompanyRepo) Get(id int) (*entity.Company, error) {
 func (companyRepo *CompanyRepo) List(conditions string) ([]entity.Company, error) {
 	companies := []entity.Company{}
 
-	getErr := companyRepo.DB.Find(&companies).Error
+	getErr := companyRepo.DB.Preload(clause.Associations).Find(&companies).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -61,7 +62,7 @@ func (companyRepo *CompanyRepo) List(conditions string) ([]entity.Company, error
 func (companyRepo *CompanyRepo) Update(id string, company *entity.Company) (*entity.Company, error) {
 	existingCompany := entity.Company{}
 
-	getErr := companyRepo.DB.Where("id = ?", id).Take(&existingCompany).Error
+	getErr := companyRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingCompany).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -72,7 +73,7 @@ func (companyRepo *CompanyRepo) Update(id string, company *entity.Company) (*ent
 	}
 
 	updated := entity.Company{}
-	companyRepo.DB.Take(&updated)
+	companyRepo.DB.Preload(clause.Associations).Take(&updated)
 
 	return &updated, nil
 }

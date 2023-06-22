@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type DeviceRepo struct {
@@ -35,21 +36,68 @@ func (deviceRepo *DeviceRepo) Create(device *entity.Device) (*entity.Device, err
 func (deviceRepo *DeviceRepo) Get(id string) (*entity.Device, error) {
 	device := entity.Device{}
 
-	getErr := deviceRepo.DB.Where("id = ?", id).First(&device).Error
+	getErr := deviceRepo.DB.
+		Preload("Vessel.Factory").
+		Preload("Vessel.Factory.Address").
+		Preload("Vessel.Factory.CreatedBy").
+		Preload("Vessel.Factory.CreatedBy.UserRole").
+		Preload("Vessel.Factory.UpdatedBy").
+		Preload("Vessel.Factory.UpdatedBy.UserRole").
+		Preload("Vessel.CreatedBy").
+		Preload("Vessel.UpdatedBy").
+		Preload("Vessel.CreatedBy.UserRole").
+		Preload("Vessel.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
+		Preload(clause.Associations).Where("id = ?", id).First(&device).Error
 	return &device, getErr
 }
 
 func (deviceRepo *DeviceRepo) List(conditions string) ([]entity.Device, error) {
 	devices := []entity.Device{}
 
-	getErr := deviceRepo.DB.Where(conditions).Find(&devices).Error
+	getErr := deviceRepo.DB.
+		Preload("Vessel.Factory").
+		Preload("Vessel.Factory.Address").
+		Preload("Vessel.Factory.CreatedBy").
+		Preload("Vessel.Factory.CreatedBy.UserRole").
+		Preload("Vessel.Factory.UpdatedBy").
+		Preload("Vessel.Factory.UpdatedBy.UserRole").
+		Preload("Vessel.CreatedBy").
+		Preload("Vessel.UpdatedBy").
+		Preload("Vessel.CreatedBy.UserRole").
+		Preload("Vessel.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
+		Preload(clause.Associations).Where(conditions).Find(&devices).Error
 	return devices, getErr
 }
 
 func (deviceRepo *DeviceRepo) Update(id string, device *entity.Device) (*entity.Device, error) {
 	existingDevice := entity.Device{}
 
-	getErr := deviceRepo.DB.Where("id = ?", id).First(&existingDevice).Error
+	getErr := deviceRepo.DB.
+		Preload(clause.Associations).Where("id = ?", id).First(&existingDevice).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -60,7 +108,29 @@ func (deviceRepo *DeviceRepo) Update(id string, device *entity.Device) (*entity.
 	}
 
 	updated := entity.Device{}
-	deviceRepo.DB.Where("id = ?", id).First(&updated)
+	deviceRepo.DB.Preload("Vessel.Factory").
+		Preload("Vessel.Factory.Address").
+		Preload("Vessel.Factory.CreatedBy").
+		Preload("Vessel.Factory.CreatedBy.UserRole").
+		Preload("Vessel.Factory.UpdatedBy").
+		Preload("Vessel.Factory.UpdatedBy.UserRole").
+		Preload("Vessel.CreatedBy").
+		Preload("Vessel.UpdatedBy").
+		Preload("Vessel.CreatedBy.UserRole").
+		Preload("Vessel.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("DeviceType.Factory").
+		Preload("DeviceType.Factory.Address").
+		Preload("DeviceType.Factory.CreatedBy").
+		Preload("DeviceType.Factory.CreatedBy.UserRole").
+		Preload("DeviceType.Factory.UpdatedBy").
+		Preload("DeviceType.Factory.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy.UserRole").
+		Preload("DeviceType.UpdatedBy.UserRole").
+		Preload("DeviceType.CreatedBy").
+		Preload("DeviceType.UpdatedBy").
+		Preload(clause.Associations).Where("id = ?", id).First(&updated)
 
 	return &updated, nil
 }

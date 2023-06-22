@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type BOMItemRepo struct {
@@ -39,7 +40,7 @@ func (bomItemRepo *BOMItemRepo) Create(bomItems *entity.BOMItem) (*entity.BOMIte
 func (bomItemRepo *BOMItemRepo) Get(id string) (*entity.BOMItem, error) {
 	bomItem := entity.BOMItem{}
 
-	getErr := bomItemRepo.DB.Where("id = ?", id).Take(&bomItem).Error
+	getErr := bomItemRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&bomItem).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -50,7 +51,24 @@ func (bomItemRepo *BOMItemRepo) Get(id string) (*entity.BOMItem, error) {
 func (bomItemRepo *BOMItemRepo) List(conditions string) ([]entity.BOMItem, error) {
 	bomItems := []entity.BOMItem{}
 
-	getErr := bomItemRepo.DB.Where(conditions).Find(&bomItems).Error
+	getErr := bomItemRepo.DB.Preload("Material.UnitOfMeasure").
+		Preload("Material.UnitOfMeasure.Factory").
+		Preload("Material.UnitOfMeasure.Factory.Address").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.UpdatedBy").
+		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.CreatedBy").
+		Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("Material.UnitOfMeasure.UpdatedBy").
+		Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("Material.CreatedBy").
+		Preload("Material.CreatedBy.UserRole").
+		Preload("Material.UpdatedBy").
+		Preload("Material.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&bomItems).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -61,7 +79,7 @@ func (bomItemRepo *BOMItemRepo) List(conditions string) ([]entity.BOMItem, error
 func (bomItemRepo *BOMItemRepo) Update(id string, update *entity.BOMItem) (*entity.BOMItem, error) {
 	bomItem := entity.BOMItem{}
 
-	getErr := bomItemRepo.DB.Where("id = ?", id).Take(&bomItem).Error
+	getErr := bomItemRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&bomItem).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -72,7 +90,7 @@ func (bomItemRepo *BOMItemRepo) Update(id string, update *entity.BOMItem) (*enti
 	}
 
 	updated := entity.BOMItem{}
-	bomItemRepo.DB.Where("id = ?", id).Take(&updated)
+	bomItemRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

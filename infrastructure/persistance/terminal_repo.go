@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type TerminalRepo struct {
@@ -38,7 +39,7 @@ func (terminalRepo *TerminalRepo) Create(termial *entity.Terminal) (*entity.Term
 
 func (terminalRepo *TerminalRepo) Get(id string) (*entity.Terminal, error) {
 	terminal := entity.Terminal{}
-	getErr := terminalRepo.DB.Where("id = ?", id).Take(&terminal).Error
+	getErr := terminalRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&terminal).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -48,7 +49,20 @@ func (terminalRepo *TerminalRepo) Get(id string) (*entity.Terminal, error) {
 
 func (terminalRepo *TerminalRepo) List(conditions string) ([]entity.Terminal, error) {
 	terminals := []entity.Terminal{}
-	getErr := terminalRepo.DB.Where(conditions).Find(&terminals).Error
+	getErr := terminalRepo.DB.
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&terminals).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -58,7 +72,7 @@ func (terminalRepo *TerminalRepo) List(conditions string) ([]entity.Terminal, er
 
 func (terminalRepo *TerminalRepo) Update(id string, update *entity.Terminal) (*entity.Terminal, error) {
 	existingTerminal := entity.Terminal{}
-	getErr := terminalRepo.DB.Where("id = ?", id).Take(&existingTerminal).Error
+	getErr := terminalRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingTerminal).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -69,7 +83,7 @@ func (terminalRepo *TerminalRepo) Update(id string, update *entity.Terminal) (*e
 	}
 
 	updated := entity.Terminal{}
-	terminalRepo.DB.Where("id = ?", id).Take(&updated)
+	terminalRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

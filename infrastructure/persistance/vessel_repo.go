@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type VesselRepo struct {
@@ -36,20 +37,37 @@ func (vesselRepo *VesselRepo) Create(vessel *entity.Vessel) (*entity.Vessel, err
 func (vesselRepo *VesselRepo) Get(id string) (*entity.Vessel, error) {
 	vessel := entity.Vessel{}
 
-	getErr := vesselRepo.DB.Where("id = ?", id).First(&vessel).Error
+	getErr := vesselRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", id).First(&vessel).Error
 	return &vessel, getErr
 }
 
 func (vesselRepo *VesselRepo) List(conditions string) ([]entity.Vessel, error) {
 	vessels := []entity.Vessel{}
 
-	getErr := vesselRepo.DB.Where(conditions).Find(&vessels).Error
+	getErr := vesselRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&vessels).Error
 	return vessels, getErr
 }
 
 func (vesselRepo *VesselRepo) Update(id string, vessel *entity.Vessel) (*entity.Vessel, error) {
 	existingVessel := entity.Vessel{}
-	getErr := vesselRepo.DB.Where("id = ?", id).First(&existingVessel).Error
+	getErr := vesselRepo.DB.
+		Preload(clause.Associations).Where("id = ?", id).First(&existingVessel).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -60,6 +78,14 @@ func (vesselRepo *VesselRepo) Update(id string, vessel *entity.Vessel) (*entity.
 	}
 
 	updated := entity.Vessel{}
-	vesselRepo.DB.Where("id = ?", id).First(&updated)
+	vesselRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", id).First(&updated)
 	return &updated, nil
 }

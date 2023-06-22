@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type StepTypeRepo struct {
@@ -35,21 +36,49 @@ func (stepTypeRepo *StepTypeRepo) Create(stepType *entity.StepType) (*entity.Ste
 func (stepTypeRepo *StepTypeRepo) Get(id string) (*entity.StepType, error) {
 	stepType := entity.StepType{}
 
-	getErr := stepTypeRepo.DB.Where("id = ?", stepType).First(&stepType).Error
+	getErr := stepTypeRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", stepType).First(&stepType).Error
 	return &stepType, getErr
 }
 
 func (stepTypeRepo *StepTypeRepo) List(conditions string) ([]entity.StepType, error) {
 	stepTypes := []entity.StepType{}
 
-	getErr := stepTypeRepo.DB.Where(conditions).Find(&stepTypes).Error
+	getErr := stepTypeRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&stepTypes).Error
 	return stepTypes, getErr
 }
 
 func (stepTypeRepo *StepTypeRepo) Update(id string, stepType *entity.StepType) (*entity.StepType, error) {
 	existingStepType := entity.StepType{}
 
-	getErr := stepTypeRepo.DB.Where("id = ?", id).First(&existingStepType).Error
+	getErr := stepTypeRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where("id = ?", id).First(&existingStepType).Error
 
 	if getErr != nil {
 		return nil, getErr
@@ -61,7 +90,17 @@ func (stepTypeRepo *StepTypeRepo) Update(id string, stepType *entity.StepType) (
 	}
 
 	updated := entity.StepType{}
-	stepTypeRepo.DB.Table(stepType.Tablename()).Where("id = ?", id).First(&updated)
+	stepTypeRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Table(stepType.Tablename()).Where("id = ?", id).First(&updated)
 
 	return &updated, nil
 }

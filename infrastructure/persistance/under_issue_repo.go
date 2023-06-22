@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UnderIssueRepo struct {
@@ -29,7 +30,7 @@ func (underIssueRepo *UnderIssueRepo) Create(underIssue *entity.UnderIssue) (*en
 	}
 
 	existingUnderIsse := entity.UnderIssue{}
-	getErr := underIssueRepo.DB.Where("job_item_id = ?", underIssue.JobItemID).Take(&existingUnderIsse).Error
+	getErr := underIssueRepo.DB.Preload(clause.Associations).Where("job_item_id = ?", underIssue.JobItemID).Take(&existingUnderIsse).Error
 	if getErr != nil {
 		creationErr := underIssueRepo.DB.Create(&underIssue).Error
 		if creationErr != nil {
@@ -49,7 +50,55 @@ func (underIssueRepo *UnderIssueRepo) List(jobID string) ([]entity.UnderIssue, e
 	underIssues := []entity.UnderIssue{}
 	rawQuery := "SELECT * FROM under_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE job_id='" + jobID + "')"
 	getErr := underIssueRepo.DB.
-		Raw(rawQuery).Find(&underIssues).Error
+		Preload("UnitOfMeasure.Factory").
+		Preload("UnitOfMeasure.Factory.Address").
+		Preload("UnitOfMeasure.Factory.CreatedBy").
+		Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.Factory.UpdatedBy").
+		Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("UnitOfMeasure.CreatedBy").
+		Preload("UnitOfMeasure.CreatedBy.UserRole").
+		Preload("UnitOfMeasure.UpdatedBy").
+		Preload("UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload("JobItem.Material").
+		Preload("JobItem.Material.UnitOfMeasure").
+		Preload("JobItem.Material.UnitOfMeasure.Factory").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.Material.CreatedBy").
+		Preload("JobItem.Material.CreatedBy.UserRole").
+		Preload("JobItem.Material.UpdatedBy").
+		Preload("JobItem.Material.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure").
+		Preload("JobItem.UnitOfMeasure.Factory").
+		Preload("JobItem.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.CreatedBy").
+		Preload("JobItem.CreatedBy.UserRole").
+		Preload("JobItem.UpdatedBy").
+		Preload("JobItem.UpdatedBy.UserRole").
+		Preload("JobItem.JobItemWeighing").
+		Preload("JobItem.JobItemWeighing.CreatedBy").
+		Preload("JobItem.JobItemWeighing.CreatedBy.UserRole").
+		Preload("JobItem.JobItemWeighing.UpdatedBy").
+		Preload("JobItem.JobItemWeighing.UpdatedBy.UserRole").
+		Preload(clause.Associations).Raw(rawQuery).Find(&underIssues).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -59,7 +108,7 @@ func (underIssueRepo *UnderIssueRepo) List(jobID string) ([]entity.UnderIssue, e
 
 func (underIssueRepo *UnderIssueRepo) Update(id string, update *entity.UnderIssue) (*entity.UnderIssue, error) {
 	existingunderIssue := entity.UnderIssue{}
-	getErr := underIssueRepo.DB.Where("id = ?", id).Take(&existingunderIssue).Error
+	getErr := underIssueRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&existingunderIssue).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -70,7 +119,7 @@ func (underIssueRepo *UnderIssueRepo) Update(id string, update *entity.UnderIssu
 	}
 
 	updated := entity.UnderIssue{}
-	underIssueRepo.DB.Where("id = ?", id).Take(&updated)
+	underIssueRepo.DB.Preload(clause.Associations).Where("id = ?", id).Take(&updated)
 
 	return &updated, nil
 }

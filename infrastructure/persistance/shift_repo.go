@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ShiftRepo struct {
@@ -39,7 +40,14 @@ func (shiftRepo *ShiftRepo) Create(shift *entity.Shift) (*entity.Shift, error) {
 func (shiftRepo *ShiftRepo) Get(id string) (*entity.Shift, error) {
 	shift := entity.Shift{}
 
-	getErr := shiftRepo.DB.Where("id = ?", id).Take(&shift).Error
+	getErr := shiftRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").Preload(clause.Associations).Where("id = ?", id).Take(&shift).Error
 	if getErr != nil {
 		return nil, getErr
 	}
@@ -50,7 +58,15 @@ func (shiftRepo *ShiftRepo) Get(id string) (*entity.Shift, error) {
 func (shiftRepo *ShiftRepo) List(conditions string) ([]entity.Shift, error) {
 	shifts := []entity.Shift{}
 
-	getErr := shiftRepo.DB.Where(conditions).Find(&shifts).Error
+	getErr := shiftRepo.DB.
+		Preload("Factory.Address").
+		Preload("Factory.CreatedBy").
+		Preload("Factory.CreatedBy.UserRole").
+		Preload("Factory.UpdatedBy").
+		Preload("Factory.UpdatedBy.UserRole").
+		Preload("CreatedBy.UserRole").
+		Preload("UpdatedBy.UserRole").
+		Preload(clause.Associations).Where(conditions).Find(&shifts).Error
 	if getErr != nil {
 		return nil, getErr
 	}
