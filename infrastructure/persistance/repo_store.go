@@ -23,6 +23,7 @@ type RepoStore struct {
 	AddressRepo                 repository.AddressRepository
 	AuthRepo                    repository.AuthRepository
 	BatchRepo                   repository.BatchRepository
+	BatchRunRepo                repository.BatchRunRepository
 	BOMRepo                     repository.BOMRepository
 	BOMItemRepo                 repository.BOMItemsRepository
 	CommonRepo                  repository.CommonRepository
@@ -100,6 +101,7 @@ func NewRepoStore(serverConfig *config.ServerConfig, logging hclog.Logger) (*Rep
 	repoStore.AddressRepo = NewAddressRepo(gormDB, logging)
 	repoStore.AuthRepo = NewAuthRepo(logging, serverConfig, cacheStore.RedisClient)
 	repoStore.BatchRepo = NewBatchRepo(gormDB, logging)
+	repoStore.BatchRunRepo = NewBatchRunRepo(gormDB, logging)
 	repoStore.BOMItemRepo = NewBOMItemRepo(gormDB, logging)
 	repoStore.BOMRepo = NewBOMRepo(gormDB, logging, repoStore.BOMItemRepo)
 	repoStore.CompanyRepo = NewCompanyRepo(gormDB, logging)
@@ -170,5 +172,6 @@ func (repoStore *RepoStore) Migrate() error {
 		&entity.Device{},
 		&entity.DeviceData{},
 		&entity.Batch{},
+		&entity.BatchRun{},
 	)
 }

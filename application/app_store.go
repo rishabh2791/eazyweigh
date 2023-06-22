@@ -6,6 +6,7 @@ type AppStore struct {
 	AddressApp                 *AddressApp
 	AuthApp                    *AuthApp
 	BatchApp                   *BatchApp
+	BatchRunApp                *BatchRunApp
 	BOMApp                     *BOMApp
 	BOMItemApp                 *BOMItemApp
 	CompanyApp                 *CompanyApp
@@ -43,6 +44,7 @@ func NewAppStore(repoStore *persistance.RepoStore) *AppStore {
 	appStore.AddressApp = NewAddressApp(repoStore.AddressRepo)
 	appStore.AuthApp = NewAuthApp(repoStore.AuthRepo)
 	appStore.BatchApp = NewBatchApp(repoStore.BatchRepo)
+	appStore.BatchRunApp = NewBatchRunApp(repoStore.BatchRunRepo)
 	appStore.BOMApp = NewBOMApp(repoStore.BOMRepo)
 	appStore.BOMItemApp = NewBOMItemApp(repoStore.BOMItemRepo)
 	appStore.CompanyApp = NewCompanyApp(repoStore.CompanyRepo)

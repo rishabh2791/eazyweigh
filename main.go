@@ -19,17 +19,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var isDebug = true
+
 func main() {
 	logger := utilities.NewConsoleLogger()
-	serverConfig := config.NewServerConfig()
 	dotenvLoadError := godotenv.Load("/home/administrator/Development/code/backend/variables.env")
-	if serverConfig.IsDebug() {
+	if isDebug {
 		dotenvLoadError = godotenv.Load("./variables.env")
 	}
 	if dotenvLoadError != nil {
 		logger.Error(dotenvLoadError.Error())
 		os.Exit(1)
 	}
+	serverConfig := config.NewServerConfig()
 
 	repoStore, repoError := persistance.NewRepoStore(serverConfig, logger)
 	if repoError != nil {

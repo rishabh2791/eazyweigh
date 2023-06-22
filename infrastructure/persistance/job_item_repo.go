@@ -37,7 +37,7 @@ func (jobItemRepo *JobItemRepo) Create(jobItem *entity.JobItem) (*entity.JobItem
 	return jobItem, nil
 }
 
-func (jobItemRepo *JobItemRepo) Get(jobID string, conditions string) ([]entity.JobItem, error) {
+func (jobItemRepo *JobItemRepo) Get(conditions string) ([]entity.JobItem, error) {
 	jobItems := []entity.JobItem{}
 
 	getErr := jobItemRepo.DB.
@@ -68,7 +68,7 @@ func (jobItemRepo *JobItemRepo) Get(jobID string, conditions string) ([]entity.J
 		Preload("Material.CreatedBy.UserRole").
 		Preload("Material.UpdatedBy").
 		Preload("Material.UpdatedBy.UserRole").
-		Preload(clause.Associations).Where("job_id = ?", jobID).Where(conditions).Find(&jobItems).Error
+		Preload(clause.Associations).Where(conditions).Find(&jobItems).Error
 	if getErr != nil {
 		return nil, getErr
 	}

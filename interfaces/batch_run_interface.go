@@ -12,19 +12,19 @@ import (
 	"github.com/hashicorp/go-hclog"
 )
 
-type JobItemInterface struct {
+type BatchRunInterface struct {
 	appStore *application.AppStore
 	logger   hclog.Logger
 }
 
-func NewJobItemInterface(appStore *application.AppStore, logger hclog.Logger) *JobItemInterface {
-	return &JobItemInterface{
+func NewBatchRunInterface(appStore *application.AppStore, logger hclog.Logger) *BatchRunInterface {
+	return &BatchRunInterface{
 		appStore: appStore,
 		logger:   logger,
 	}
 }
 
-func (jobItemsInterface *JobItemInterface) Create(ctx *gin.Context) {
+func (batchInterface *BatchRunInterface) Create(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	requestingUser, ok := ctx.Get("user")
@@ -38,7 +38,7 @@ func (jobItemsInterface *JobItemInterface) Create(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.JobItem{}
+	model := entity.BatchRun{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -52,7 +52,7 @@ func (jobItemsInterface *JobItemInterface) Create(ctx *gin.Context) {
 	model.CreatedByUsername = user.Username
 	model.UpdatedByUsername = user.Username
 
-	created, creationErr := jobItemsInterface.appStore.JobItemApp.Create(&model)
+	created, creationErr := batchInterface.appStore.BatchRunApp.Create(&model)
 	if creationErr != nil {
 		response.Status = false
 		response.Message = creationErr.Error()
@@ -63,62 +63,34 @@ func (jobItemsInterface *JobItemInterface) Create(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Job Items Created."
+	response.Message = "Batch Created."
 	response.Payload = created
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobItemsInterface *JobItemInterface) CreateMultiple(ctx *gin.Context) {
+func (batchInterface *BatchRunInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
-	createdModels := []interface{}{}
-	creationErrors := []interface{}{}
+	id := ctx.Param("id")
 
-	requestingUser, ok := ctx.Get("user")
-	if !ok {
+	batch, getErr := batchInterface.appStore.BatchApp.Get(id)
+	if getErr != nil {
 		response.Status = false
-		response.Message = "Anonymous User"
-		response.Payload = ""
-
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
-	user := requestingUser.(*entity.User)
-
-	models := []entity.JobItem{}
-	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&models)
-	if jsonErr != nil {
-		response.Status = false
-		response.Message = jsonErr.Error()
+		response.Message = getErr.Error()
 		response.Payload = ""
 
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
-	for _, model := range models {
-		model.CreatedByUsername = user.Username
-		model.UpdatedByUsername = user.Username
-
-		_, creationErr := jobItemsInterface.appStore.JobItemApp.Create(&model)
-		if creationErr != nil {
-			creationErrors = append(creationErrors, creationErr)
-		} else {
-			createdModels = append(createdModels, model)
-		}
-	}
-
 	response.Status = true
-	response.Message = "Job Items Created."
-	response.Payload = map[string]interface{}{
-		"models": createdModels,
-		"errors": creationErrors,
-	}
+	response.Message = "Batch Found"
+	response.Payload = batch
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobItemsInterface *JobItemInterface) Get(ctx *gin.Context) {
+func (batchInterface *BatchRunInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
 
 	conditions := map[string]interface{}{}
@@ -132,7 +104,7 @@ func (jobItemsInterface *JobItemInterface) Get(ctx *gin.Context) {
 		return
 	}
 
-	jobItems, getErr := jobItemsInterface.appStore.JobItemApp.Get(utilities.ConvertJSONToSQL(conditions))
+	batches, getErr := batchInterface.appStore.BatchApp.List(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -143,13 +115,13 @@ func (jobItemsInterface *JobItemInterface) Get(ctx *gin.Context) {
 	}
 
 	response.Status = true
-	response.Message = "Job Items Found"
-	response.Payload = jobItems
+	response.Message = "Batches Found"
+	response.Payload = batches
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (jobItemsInterface *JobItemInterface) Update(ctx *gin.Context) {
+func (batchInterface *BatchRunInterface) Update(ctx *gin.Context) {
 	response := value_objects.Response{}
 	id := ctx.Param("id")
 
@@ -164,7 +136,7 @@ func (jobItemsInterface *JobItemInterface) Update(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.JobItem{}
+	model := entity.Batch{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -176,7 +148,7 @@ func (jobItemsInterface *JobItemInterface) Update(ctx *gin.Context) {
 	}
 	model.UpdatedByUsername = user.Username
 
-	updated, updationErr := jobItemsInterface.appStore.JobItemApp.Update(id, &model)
+	updated, updationErr := batchInterface.appStore.BatchApp.Update(id, &model)
 	if updationErr != nil {
 		response.Status = false
 		response.Message = updationErr.Error()
@@ -188,7 +160,7 @@ func (jobItemsInterface *JobItemInterface) Update(ctx *gin.Context) {
 
 	// Return response.
 	response.Status = true
-	response.Message = "Job Item Updated."
+	response.Message = "Batch Updated."
 	response.Payload = updated
 
 	ctx.JSON(http.StatusOK, response)

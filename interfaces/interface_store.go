@@ -12,6 +12,7 @@ type InterfaceStore struct {
 	AddressInterface           *AddressInterface
 	AuthInterface              *AuthInterface
 	BatchInterface             *BatchInterface
+	BatchRunInterface          *BatchRunInterface
 	BOMInterface               *BOMInterface
 	BOMItemInterface           *BOMItemInterface
 	CompanyInterface           *CompanyInterface
@@ -51,6 +52,7 @@ func NewInterfaceStore(logger hclog.Logger, appStore *application.AppStore) *Int
 	interfaceStore.AddressInterface = NewAddressInterface(appStore, logger)
 	interfaceStore.AuthInterface = NewAuthInterface(appStore, logger)
 	interfaceStore.BatchInterface = NewBatchInterface(appStore, logger)
+	interfaceStore.BatchRunInterface = NewBatchRunInterface(appStore, logger)
 	interfaceStore.BOMInterface = NewBOMInterface(appStore, logger)
 	interfaceStore.BOMItemInterface = NewBOMItemInterface(appStore, logger)
 	interfaceStore.CompanyInterface = NewCompanyInterface(appStore, logger)
