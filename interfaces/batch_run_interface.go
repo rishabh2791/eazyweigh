@@ -73,7 +73,7 @@ func (batchInterface *BatchRunInterface) Get(ctx *gin.Context) {
 	response := value_objects.Response{}
 	id := ctx.Param("id")
 
-	batch, getErr := batchInterface.appStore.BatchApp.Get(id)
+	batch, getErr := batchInterface.appStore.BatchRunApp.Get(id)
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -104,7 +104,7 @@ func (batchInterface *BatchRunInterface) List(ctx *gin.Context) {
 		return
 	}
 
-	batches, getErr := batchInterface.appStore.BatchApp.List(utilities.ConvertJSONToSQL(conditions))
+	batches, getErr := batchInterface.appStore.BatchRunApp.List(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()
@@ -136,7 +136,7 @@ func (batchInterface *BatchRunInterface) Update(ctx *gin.Context) {
 	}
 	user := requestingUser.(*entity.User)
 
-	model := entity.Batch{}
+	model := entity.BatchRun{}
 	jsonErr := json.NewDecoder(ctx.Request.Body).Decode(&model)
 	if jsonErr != nil {
 		response.Status = false
@@ -148,7 +148,7 @@ func (batchInterface *BatchRunInterface) Update(ctx *gin.Context) {
 	}
 	model.UpdatedByUsername = user.Username
 
-	updated, updationErr := batchInterface.appStore.BatchApp.Update(id, &model)
+	updated, updationErr := batchInterface.appStore.BatchRunApp.Update(id, &model)
 	if updationErr != nil {
 		response.Status = false
 		response.Message = updationErr.Error()
