@@ -32,6 +32,7 @@ type DeviceType struct {
 	CreatedBy         *User    `json:"created_by"`
 	UpdatedByUsername string   `json:"updated_by_username" gorm:"size:20;not null;"`
 	UpdatedBy         *User    `json:"updated_by"`
+	ViewColour        string   `json:"view_color" gorm:"size:200;not null;default:'0xFFFFFFFF';"`
 }
 
 func (DeviceType) Tablename() string {
@@ -53,9 +54,15 @@ func (model *DeviceType) Validate() error {
 	if model.FactoryID == "" || len(model.FactoryID) == 0 {
 		errors["factory"] = "Factory Required."
 	}
+
 	if model.CreatedByUsername == "" || len(model.CreatedByUsername) == 0 {
 		errors["created_by"] = "Created By Required."
 	}
+
+	if model.ViewColour == "" || len(model.ViewColour) == 0 {
+		errors["view_colour"] = "View Colour Can Not be Empty.\n"
+	}
+
 	if model.UpdatedByUsername == "" || len(model.UpdatedByUsername) == 0 {
 		errors["updated_by"] = "Updated By Required."
 	}
