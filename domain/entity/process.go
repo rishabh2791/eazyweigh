@@ -22,7 +22,7 @@ type Process struct {
 }
 
 func (Process) Tablename() string {
-	return "steps"
+	return "processes"
 }
 
 func (process *Process) BeforeCreate(db *gorm.DB) error {
