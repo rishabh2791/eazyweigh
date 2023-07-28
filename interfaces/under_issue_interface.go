@@ -4,6 +4,7 @@ import (
 	"eazyweigh/application"
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/value_objects"
+	"eazyweigh/infrastructure/utilities"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -121,9 +122,19 @@ func (underIssueInterface *UnderIssueInterface) CreateMultiple(ctx *gin.Context)
 
 func (underIssueInterface *UnderIssueInterface) List(ctx *gin.Context) {
 	response := value_objects.Response{}
-	jobID := ctx.Param("id")
 
-	underIssues, getErr := underIssueInterface.appStore.UnderIssueApp.List(jobID)
+	conditions := map[string]interface{}{}
+	jsonError := json.NewDecoder(ctx.Request.Body).Decode(&conditions)
+	if jsonError != nil {
+		response.Status = false
+		response.Message = jsonError.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	underIssues, getErr := underIssueInterface.appStore.UnderIssueApp.List(utilities.ConvertJSONToSQL(conditions))
 	if getErr != nil {
 		response.Status = false
 		response.Message = getErr.Error()

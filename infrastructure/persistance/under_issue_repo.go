@@ -46,9 +46,9 @@ func (underIssueRepo *UnderIssueRepo) Create(underIssue *entity.UnderIssue) (*en
 	return underIssue, nil
 }
 
-func (underIssueRepo *UnderIssueRepo) List(jobID string) ([]entity.UnderIssue, error) {
+func (underIssueRepo *UnderIssueRepo) List(conditions string) ([]entity.UnderIssue, error) {
 	underIssues := []entity.UnderIssue{}
-	rawQuery := "SELECT * FROM under_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE job_id='" + jobID + "')"
+	rawQuery := "SELECT * FROM under_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE '" + conditions + "')"
 	getErr := underIssueRepo.DB.
 		Preload("UnitOfMeasure.Factory").
 		Preload("UnitOfMeasure.Factory.Address").

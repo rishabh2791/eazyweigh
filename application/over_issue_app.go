@@ -19,7 +19,7 @@ func NewOverIssueApp(overIssueRepository repository.OverIssueRepository) *OverIs
 
 type OverIssueAppInterface interface {
 	Create(overIssue *entity.OverIssue) (*entity.OverIssue, error)
-	List(jobID string) ([]entity.OverIssue, error)
+	List(conditions string) ([]entity.OverIssue, error)
 	Update(id string, update *entity.OverIssue) (*entity.OverIssue, error)
 }
 
@@ -27,8 +27,8 @@ func (overIssueApp *OverIssueApp) Create(overIssue *entity.OverIssue) (*entity.O
 	return overIssueApp.overIssueRepository.Create(overIssue)
 }
 
-func (overIssueApp *OverIssueApp) List(jobID string) ([]entity.OverIssue, error) {
-	return overIssueApp.overIssueRepository.List(jobID)
+func (overIssueApp *OverIssueApp) List(conditions string) ([]entity.OverIssue, error) {
+	return overIssueApp.overIssueRepository.List(conditions)
 }
 
 func (overIssueApp *OverIssueApp) Update(id string, update *entity.OverIssue) (*entity.OverIssue, error) {

@@ -24,6 +24,6 @@ func NewUnderIssueRouter(router *gin.RouterGroup, iStore *interfaces.InterfaceSt
 func (underIssueRouter *UnderIssueRouter) ServeRoutes() {
 	underIssueRouter.router.POST("/create/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Create)
 	underIssueRouter.router.POST("/create/multi/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.CreateMultiple)
-	underIssueRouter.router.GET("/:id/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.List)
+	underIssueRouter.router.POST("/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.List)
 	underIssueRouter.router.PATCH("/:id/", underIssueRouter.middlewares.AuthMiddleware.ValidateAccessToken(), underIssueRouter.interfaceStore.UnderIssueInterface.Update)
 }
