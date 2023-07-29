@@ -51,7 +51,8 @@ func (overIssueRepo *OverIssueRepo) Create(overIssue *entity.OverIssue) (*entity
 
 func (overIssueRepo *OverIssueRepo) List(conditions string) ([]entity.OverIssue, error) {
 	overIssues := []entity.OverIssue{}
-	rawQuery := "SELECT * FROM over_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE '" + conditions + "')"
+	rawQuery := "SELECT * FROM over_issues WHERE job_item_id IN (SELECT id FROM job_items WHERE " + conditions + ")"
+
 	getErr := overIssueRepo.DB.
 		Preload("UnitOfMeasure.Factory").
 		Preload("UnitOfMeasure.Factory.Address").

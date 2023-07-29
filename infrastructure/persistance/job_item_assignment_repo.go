@@ -117,7 +117,6 @@ func (jobItemAssignmentRepo *JobItemAssignmentRepo) Get(id string) (*entity.JobI
 
 func (jobItemAssignmentRepo *JobItemAssignmentRepo) List(conditions string) ([]entity.JobItemAssignment, error) {
 	jobItemAssignments := []entity.JobItemAssignment{}
-	allJobItemAssignments := []entity.JobItemAssignment{}
 
 	getErr := jobItemAssignmentRepo.DB.
 		Preload("ShiftSchedule.Shift").
@@ -138,51 +137,41 @@ func (jobItemAssignmentRepo *JobItemAssignmentRepo) List(conditions string) ([]e
 		Preload("ShiftSchedule.UpdatedBy.UserRole").
 		Preload("CreatedBy.UserRole").
 		Preload("UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure").
+		Preload("JobItem.Material.UnitOfMeasure.Factory").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.Material.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.Material.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.UnitOfMeasure.Factory").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.Factory.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.CreatedBy").
+		Preload("JobItem.UnitOfMeasure.CreatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy").
+		Preload("JobItem.UnitOfMeasure.UpdatedBy.UserRole").
+		Preload("JobItem.UnitOfMeasure.Factory.Address").
+		Preload("JobItem.CreatedBy").
+		Preload("JobItem.UpdatedBy").
+		Preload("JobItem.CreatedBy.UserRole").
+		Preload("JobItem.UpdatedBy.UserRole").
+		Preload("JobItem.Material.CreatedBy").
+		Preload("JobItem.Material.CreatedBy.UserRole").
+		Preload("JobItem.Material.UpdatedBy").
+		Preload("JobItem.Material.UpdatedBy.UserRole").
 		Preload(clause.Associations).Where(conditions).Find(&jobItemAssignments).Error
-		for _, jobItemAssignment:= range jobItemAssignments{
-			thisJobItemAssignment := entity.JobItemAssignment{}
-			thisJobItemAssignment = jobItemAssignment
-			jobItemID := jobItemAssignment.JobItemID			
-			jobItem := entity.JobItem{}
-			jobItemErr := jobItemAssignmentRepo.DB.
-				Preload("Material.UnitOfMeasure").
-				Preload("Material.UnitOfMeasure.Factory").
-				Preload("Material.UnitOfMeasure.Factory.CreatedBy").
-				Preload("Material.UnitOfMeasure.Factory.CreatedBy.UserRole").
-				Preload("Material.UnitOfMeasure.Factory.UpdatedBy").
-				Preload("Material.UnitOfMeasure.Factory.UpdatedBy.UserRole").
-				Preload("Material.UnitOfMeasure.CreatedBy").
-				Preload("Material.UnitOfMeasure.CreatedBy.UserRole").
-				Preload("Material.UnitOfMeasure.UpdatedBy").
-				Preload("Material.UnitOfMeasure.UpdatedBy.UserRole").
-				Preload("Material.UnitOfMeasure.Factory.Address").
-				Preload("UnitOfMeasure.Factory").
-				Preload("UnitOfMeasure.Factory.CreatedBy").
-				Preload("UnitOfMeasure.Factory.CreatedBy.UserRole").
-				Preload("UnitOfMeasure.Factory.UpdatedBy").
-				Preload("UnitOfMeasure.Factory.UpdatedBy.UserRole").
-				Preload("UnitOfMeasure.CreatedBy").
-				Preload("UnitOfMeasure.CreatedBy.UserRole").
-				Preload("UnitOfMeasure.UpdatedBy").
-				Preload("UnitOfMeasure.UpdatedBy.UserRole").
-				Preload("UnitOfMeasure.Factory.Address").
-				Preload("CreatedBy.UserRole").
-				Preload("UpdatedBy.UserRole").
-				Preload("Material.CreatedBy").
-				Preload("Material.CreatedBy.UserRole").
-				Preload("Material.UpdatedBy").
-				Preload("Material.UpdatedBy.UserRole").
-				Preload(clause.Associations).Where("id = ?",jobItemID).Take(&jobItem).Error			
-			if jobItemErr != nil {
-				
-			}
-			thisJobItemAssignment.JobItem=&jobItem
-			allJobItemAssignments = append(allJobItemAssignments, thisJobItemAssignment)
-		}
+
 	if getErr != nil {
 		return nil, getErr
 	}
-	return allJobItemAssignments, nil
+	return jobItemAssignments, nil
 }
 
 func (jobItemAssignmentRepo *JobItemAssignmentRepo) Update(id string, update *entity.JobItemAssignment) (*entity.JobItemAssignment, error) {
