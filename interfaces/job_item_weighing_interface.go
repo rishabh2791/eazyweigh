@@ -165,3 +165,24 @@ func (jobItemWeighingInterface *JobItemWeighingInterface) Details(ctx *gin.Conte
 
 	ctx.JSON(http.StatusOK, response)
 }
+
+func (jobItemWeighingInterface *JobItemWeighingInterface) Materials(ctx *gin.Context) {
+	response := value_objects.Response{}
+	materialID := ctx.Param("material_id")
+
+	jobItems, getErr := jobItemWeighingInterface.appStore.JobItemWeighingApp.MaterialDetails(materialID)
+	if getErr != nil {
+		response.Status = false
+		response.Message = getErr.Error()
+		response.Payload = ""
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response.Status = true
+	response.Message = "Job Item Weighing Materials Found"
+	response.Payload = jobItems
+
+	ctx.JSON(http.StatusOK, response)
+}

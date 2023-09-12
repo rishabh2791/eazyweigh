@@ -3,7 +3,9 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
-	"log"
+	"encoding/json"
+
+	"time"
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
@@ -27,7 +29,6 @@ func NewOverIssueRepo(db *gorm.DB, logger hclog.Logger) *OverIssueRepo {
 func (overIssueRepo *OverIssueRepo) Create(overIssue *entity.OverIssue) (*entity.OverIssue, error) {
 	validationErr := overIssue.Validate()
 	if validationErr != nil {
-		log.Println(validationErr)
 		return nil, validationErr
 	}
 
@@ -36,11 +37,22 @@ func (overIssueRepo *OverIssueRepo) Create(overIssue *entity.OverIssue) (*entity
 	if getErr != nil {
 		creationErr := overIssueRepo.DB.Create(&overIssue).Error
 		if creationErr != nil {
-			log.Println(creationErr)
 			return nil, creationErr
 		}
 	} else {
-		updationErr := overIssueRepo.DB.Table(entity.OverIssue{}.Tablename()).Where("job_item_id = ?", overIssue.JobItemID).Updates(overIssue).Error
+		var update map[string]interface{}
+		u, _ := json.Marshal(overIssue)
+		json.Unmarshal(u, &update)
+		update["updated_at"] = time.Now()
+		delete(update, "created_by")
+		delete(update, "created_at")
+		delete(update, "updated_by")
+		delete(update, "job_item")
+		delete(update, "id")
+		delete(update, "unit_of_measurement")
+		update["unit_of_measure_id"] = update["unit_of_measurement_id"]
+		delete(update, "unit_of_measurement_id")
+		updationErr := overIssueRepo.DB.Table(entity.OverIssue{}.Tablename()).Where("job_item_id = ?", overIssue.JobItemID).Updates(update).Error
 		if updationErr != nil {
 			return nil, updationErr
 		}

@@ -3,6 +3,8 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"encoding/json"
+	"time"
 
 	"github.com/hashicorp/go-hclog"
 	"gorm.io/gorm"
@@ -37,7 +39,19 @@ func (underIssueRepo *UnderIssueRepo) Create(underIssue *entity.UnderIssue) (*en
 			return nil, creationErr
 		}
 	} else {
-		updationErr := underIssueRepo.DB.Table(entity.UnderIssue{}.Tablename()).Where("job_item_id = ?", underIssue.JobItemID).Updates(underIssue).Error
+		var update map[string]interface{}
+		u, _ := json.Marshal(underIssue)
+		json.Unmarshal(u, &update)
+		update["updated_at"] = time.Now()
+		delete(update, "created_by")
+		delete(update, "created_at")
+		delete(update, "updated_by")
+		delete(update, "job_item")
+		delete(update, "id")
+		delete(update, "unit_of_measurement")
+		update["unit_of_measure_id"] = update["unit_of_measurement_id"]
+		delete(update, "unit_of_measurement_id")
+		updationErr := underIssueRepo.DB.Table(entity.UnderIssue{}.Tablename()).Where("job_item_id = ?", underIssue.JobItemID).Updates(update).Error
 		if updationErr != nil {
 			return nil, updationErr
 		}

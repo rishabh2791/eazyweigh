@@ -9,4 +9,5 @@ type JobItemWeighingRepository interface {
 	List(jobItemID string) ([]entity.JobItemWeighing, error)
 	Update(id string, jobItemWeighing *entity.JobItemWeighing) (*entity.JobItemWeighing, error)
 	Details(conditions string) ([]entity.WeighingBatch, error)
+	MaterialDetails(materialID string) ([]entity.MaterialWeighing, error)
 }

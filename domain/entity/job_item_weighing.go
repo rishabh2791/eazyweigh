@@ -60,3 +60,16 @@ type WeighingBatch struct {
 	JobCode           string  `json:"job_code"`
 	JobMaterialID     string  `json:"job_material_id"`
 }
+
+type MaterialWeighing struct {
+	JobItemID         string    `json:"job_item_id"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	Weight            float32   `json:"weight"`
+	UpdatedByUsername string    `json:"updated_by_username"`
+	Batch             string    `json:"batch"`
+	Verified          bool      `json:"verified"`
+	MaterialID        string    `json:"material_id"`
+	JobID             string    `json:"job_id"`
+	JobCode           string    `json:"job_code"`
+}

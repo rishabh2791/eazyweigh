@@ -26,4 +26,5 @@ func (jobItemWeightRouter *JobItemWeightRouter) ServeRoutes() {
 	jobItemWeightRouter.router.GET("/list/:job_item_id/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.List)
 	jobItemWeightRouter.router.PATCH("/:id/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.Update)
 	jobItemWeightRouter.router.POST("/batch/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.Details)
+	jobItemWeightRouter.router.GET("/material/:material_id/", jobItemWeightRouter.middlewares.AuthMiddleware.ValidateAccessToken(), jobItemWeightRouter.interfaceStore.JobItemWeighingInterface.Materials)
 }

@@ -3,6 +3,7 @@ package persistance
 import (
 	"eazyweigh/domain/entity"
 	"eazyweigh/domain/repository"
+	"fmt"
 	"math"
 
 	"github.com/hashicorp/go-hclog"
@@ -136,5 +137,14 @@ func (jobItemWeighingRepo *JobItemWeighingRepo) Details(conditions string) ([]en
 		queryString += ";"
 	}
 	getErr := jobItemWeighingRepo.DB.Raw(queryString).Find(&data).Error
+	return data, getErr
+}
+
+func (jobItemWeighingRepo *JobItemWeighingRepo) MaterialDetails(materialID string) ([]entity.MaterialWeighing, error) {
+	data := []entity.MaterialWeighing{}
+
+	queryString := fmt.Sprintf("SELECT job_item_weighings.job_item_id, job_item_weighings.created_at, job_item_weighings.updated_at, job_item_weighings.weight, job_item_weighings.updated_by_username, job_item_weighings.batch, job_item_weighings.verified, job_items.material_id, job_items.job_id, jobs.job_code FROM `job_item_weighings` LEFT JOIN job_items ON job_items.id = job_item_id LEFT JOIN jobs on jobs.id = job_items.job_id WHERE job_items.material_id = '%s';", materialID)
+	getErr := jobItemWeighingRepo.DB.Raw(queryString).Find(&data).Error
+
 	return data, getErr
 }
