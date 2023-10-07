@@ -15,6 +15,15 @@ func (equals EQUALS) BuildConditions() string {
 	return fmt.Sprintf("`%s` = '%s'", strings.ReplaceAll(equals.Field, ".", "`.`"), equals.Value.(string))
 }
 
+type IS struct {
+	Field string
+	Value interface{}
+}
+
+func (is IS) BuildConditions() string {
+	return fmt.Sprintf("`%s` IS %s", is.Field, is.Value.(string))
+}
+
 type LIKE struct {
 	Field string
 	Value interface{}
@@ -143,6 +152,17 @@ func BuildQuery(cond interface{}) interface{} {
 				}
 			}
 			return equals
+		case "IS":
+			is := IS{}
+			for k, v := range value.(map[string]interface{}) {
+				switch k {
+				case "Field":
+					is.Field = v.(string)
+				case "Value":
+					is.Value = v.(string)
+				}
+			}
+			return is
 		case "NOTEQUALS":
 			notEquals := NOTEQUALS{}
 			for k, v := range value.(map[string]interface{}) {
@@ -257,6 +277,8 @@ func ConvertJSONToSQL(body map[string]interface{}) string {
 			sqlQuery += BuildQuery(body).(LIKE).BuildConditions()
 		case "EQUALS":
 			sqlQuery += BuildQuery(body).(EQUALS).BuildConditions()
+		case "IS":
+			sqlQuery += BuildQuery(body).(IS).BuildConditions()
 		case "NOTEQUALS":
 			sqlQuery += BuildQuery(body).(NOTEQUALS).BuildConditions()
 		case "IN":
@@ -289,6 +311,8 @@ func getCondition(conditionType string, condition interface{}) string {
 		queryString = condition.(LIKE).BuildConditions()
 	case "EQUALS":
 		queryString = condition.(EQUALS).BuildConditions()
+	case "IS":
+		queryString = condition.(IS).BuildConditions()
 	case "NOTEQUALS":
 		queryString = condition.(NOTEQUALS).BuildConditions()
 	case "IN":

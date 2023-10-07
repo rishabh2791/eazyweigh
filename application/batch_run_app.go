@@ -23,6 +23,11 @@ func (batchApp *BatchRunApp) Create(batch *entity.BatchRun) (*entity.BatchRun, e
 	return batchApp.batchRunRepository.Create(batch)
 }
 
+func (batchApp *BatchRunApp) CreateSuper(batch *entity.BatchRun) (*entity.BatchRun, error) {
+	log.Println("here")
+	return batchApp.batchRunRepository.CreateSuper(batch)
+}
+
 func (batchApp *BatchRunApp) Get(id string) (*entity.BatchRun, error) {
 	return batchApp.batchRunRepository.Get(id)
 }
@@ -37,6 +42,7 @@ func (batchApp *BatchRunApp) Update(id string, batch *entity.BatchRun) (*entity.
 
 type BatchRunAppInterface interface {
 	Create(batch *entity.BatchRun) (*entity.BatchRun, error)
+	CreateSuper(batch *entity.BatchRun) (*entity.BatchRun, error)
 	Get(id string) (*entity.BatchRun, error)
 	List(conditions string) ([]entity.BatchRun, error)
 	Update(id string, batch *entity.BatchRun) (*entity.BatchRun, error)

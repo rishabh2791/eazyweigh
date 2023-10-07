@@ -67,6 +67,25 @@ func (batchRepo *BatchRunRepo) Create(batch *entity.BatchRun) (*entity.BatchRun,
 	return batch, nil
 }
 
+func (batchRepo *BatchRunRepo) CreateSuper(batch *entity.BatchRun) (*entity.BatchRun, error) {
+	validationErr := batch.Validate()
+	if validationErr != nil {
+		return nil, validationErr
+	}
+
+	tx := batchRepo.DB.Begin()
+
+	creationErr := tx.Create(&batch).Error
+	if creationErr != nil {
+		tx.Rollback()
+		return nil, creationErr
+	}
+
+	tx.Commit()
+
+	return batch, nil
+}
+
 func (batchRepo *BatchRunRepo) Get(id string) (*entity.BatchRun, error) {
 	batch := entity.BatchRun{}
 
